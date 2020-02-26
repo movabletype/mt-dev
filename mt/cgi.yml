@@ -1,0 +1,5 @@
+version: "3"
+services:
+  mt:
+    restart: always
+    command: "/usr/sbin/httpd -D FOREGROUND"

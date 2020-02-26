@@ -1,0 +1,7 @@
+version: "3"
+services:
+  mt:
+    restart: always
+    command: "${PLACKUP:-./plackup-mt -E production -L Shotgun --port=80 --workers=2 --pid=/tmp/mt.psgi.pid} /var/www/cgi-bin/mt/mt.psgi"
+    volumes:
+      - "./plackup-mt:/var/www/cgi-bin/mt/plackup-mt"

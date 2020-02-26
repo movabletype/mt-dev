@@ -1,0 +1,16 @@
+FROM movabletype/test:fedora
+
+ADD core.conf /etc/httpd/conf.d/
+ADD mt-static.conf /etc/httpd/conf.d/
+
+RUN set -ex &&\
+  \
+  perl -i -pe \
+    's{AllowOverride None}{AllowOverride All}g' \
+    /etc/httpd/conf/httpd.conf
+
+RUN set -ex &&\
+  \
+  cpm install -g \
+    Starman Linux::Inotify2 Net::LDAP &&\
+  rm -fr /root/.perl-cpm/

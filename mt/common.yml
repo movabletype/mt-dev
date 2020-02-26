@@ -1,0 +1,40 @@
+version: "3"
+services:
+  mt:
+    image: ${DOCKER_MT_IMAGE:-movabletype/dev:perl-5.28}
+    restart: always
+    working_dir: /var/www/cgi-bin/mt
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
+    volumes:
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
+      - "${BASE_SITE_PATH:-site}:/var/www/html"
+      - "support:/var/www/cgi-bin/mt/mt-static/support"
+      # override entrypoint
+      - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
+
+  httpd:
+    image: ${DOCKER_HTTPD_IMAGE:-movabletype/dev:php-7.3}
+    restart: always
+    entrypoint: "/usr/local/bin/docker-entrypoint.sh"
+    volumes:
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
+      - "${BASE_SITE_PATH:-site}:/var/www/html"
+      - "support:/var/www/cgi-bin/mt/mt-static/support"
+      # override entrypoint
+      - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
+      # proxy setting
+      - "./cgi-bin-mt.htaccess:/var/www/html/cgi-bin/mt/.htaccess"
+      - "./cgi-bin-mt.htaccess:/var/www/cgi-bin/mt/.htaccess"
+    ports:
+      - "${HTTPD_EXPOSE_PORT:-80}:80"
+    command: apache2-foreground
+
+volumes:
+  site:
+    driver: local
+  support:
+    driver: local
+  mt-dev-mt-home-tmp:
+    external: true

@@ -1,0 +1,196 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin;
+use lib "$FindBin::Bin/local/lib/perl5";
+
+use Cwd qw(realpath);
+use Data::Dumper;
+use Getopt::Long;
+use HTTP::Tiny;
+use Config::Tiny;
+use YAML::Tiny qw(LoadFile DumpFile);
+use File::Basename qw(basename);
+use File::Spec::Functions qw(catfile);
+use File::Temp qw(tempfile tmpnam);
+
+GetOptions(
+    'recipe=s' => \my $recipes,
+    'repo=s'   => \my $repos,
+);
+
+my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
+my $repo_dir      = realpath("$FindBin::Bin/../repo");
+my $repo_base_dir = realpath("$FindBin::Bin/../..");
+my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
+
+my $env   = {};
+my $yamls = [];
+
+sub handle_recipe {
+    my $data = shift;
+
+    # detect docker images
+    if ( my $perl = delete $data->{perl} ) {
+        $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
+    }
+    if ( my $mysql = delete $data->{database} ) {
+        $env->{DOCKER_MYSQL_IMAGE} = $mysql;
+    }
+    if ( my $php = delete $data->{php} ) {
+        $env->{DOCKER_HTTPD_IMAGE} = "movabletype/dev:php-$php";
+    }
+
+    # checout branch and collect links
+    my @volumes;
+    for my $k ( keys %$data ) {
+        my $repo     = $data->{$k}{location};
+        my $dest_dir = $data->{$k}{directory} || do {
+            ( my $dir = $repo ) =~ s{.*/}{};
+            "$repo_base_dir/$dir";
+        };
+        if ( $dest_dir !~ m{\A/} ) {
+            $dest_dir = "$repo_base_dir/$dest_dir";
+        }
+
+        if ( $k eq 'core' ) {
+            $env->{MT_HOME_PATH} = $dest_dir;
+        }
+
+        if ($repo) {
+            my $cmd
+                = "$git_clone_cmd $repo $dest_dir @{[$data->{$k}{branch} || '']}";
+            my $res = `$cmd 2>&1` || "";
+            die "$res\nGot an error: $cmd" if $?;
+
+            $res = `cd $dest_dir && git rev-parse HEAD 2>&1`;
+            die "$res\nGot an error: git rev-parse HEAD" if $?;
+            print STDERR "$k:$res";
+        }
+
+        next if $k eq 'core';
+
+        my $plugin_dir = $dest_dir;
+        if ( $data->{$k}{prefix} ) {
+            $plugin_dir = catfile( $plugin_dir, $data->{$k}{prefix} );
+        }
+
+        my $links = $data->{$k}{links};
+        if ( !$links ) {
+            $links = [
+                map { $_ =~ s{\A$plugin_dir/}{}; $_ } (
+                    glob("$plugin_dir/*.cgi"),
+                    glob("$plugin_dir/plugins/*"),
+                    glob("$plugin_dir/mt-static/plugins/*"),
+                    glob("$plugin_dir/themes/*"),
+                    glob("$plugin_dir/addons/*"),
+                    glob("$plugin_dir/mt-static/addons/*"),
+                )
+            ];
+        }
+
+        for my $l (@$links) {
+            push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l'";
+        }
+    }
+
+    my ( $fh, $file ) = tmpnam();
+    print $fh <<YAML;
+version: "3"
+services:
+  mt:
+    volumes:
+@{[join "\n", @volumes]}
+  httpd:
+    volumes:
+@{[join "\n", @volumes]}
+YAML
+    close $fh;
+
+    push @$yamls, $file;
+}
+
+for my $recipe ( split /\s+/, $recipes ) {
+    $recipe =~ s{\.yaml\z}{};
+    $recipe .= '.yaml';
+
+    my $recipe_file = "$recipe_dir/$recipe";
+
+    # get recipe
+    if ( !-e $recipe_file || realpath($recipe_file) !~ m/^$recipe_dir/ ) {
+        $recipe_file = "";
+
+        my $recipe_url = $recipe =~ m{\Ahttps?://} ? $recipe : do {
+            my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
+
+            my $conf = Config::Tiny->read( $conf_file, 'utf8' );
+            if ( !$conf ) {
+                $conf = Config::Tiny->new;
+
+                print STDERR "Please input base URL of recipe data: ";
+                my $base = <STDIN>;
+                chomp $base;
+
+                $conf->{recipe}{base_url} = $base;
+                $conf->write( $conf_file, 'utf8' );
+            }
+
+            if ( $conf->{recipe}{base_url} ) {
+                my $base_url = $conf->{recipe}{base_url};
+                $base_url =~ s/\/+$//;
+                "$base_url/$recipe";
+            }
+            else {
+                "";
+            }
+        };
+
+        if ($recipe_url) {
+            my $response = HTTP::Tiny->new->get($recipe_url);
+            die "Failed: @{[Dumper($response)]}"
+                unless $response->{success} && length $response->{content};
+
+            my ( $fh, $filename ) = tempfile();
+            print $fh $response->{content};
+
+            $recipe_file = $filename;
+        }
+
+        if ( !$recipe_file ) {
+            die qq{Can not find recipe for "$recipe".};
+        }
+    }
+
+    handle_recipe( LoadFile($recipe_file) );
+}
+
+for my $r ( split /\s+/, $repos ) {
+    my $repo_dir = "$repo_dir/$r";
+
+    # get repo
+    if ( !-e $repo_dir || realpath($repo_dir) !~ m/^$repo_dir/ ) {
+        my $k = basename($r);
+        $repo_dir = catfile( $repo_base_dir, $k );
+
+        my $cmd = "$git_clone_cmd $r $repo_dir";
+        my $res = `$cmd 2>&1` || "";
+        die "$res\nGot an error: $cmd" if $?;
+
+        $res = `cd $repo_dir && git rev-parse HEAD 2>&1`;
+        die "$res\nGot an error: git rev-parse HEAD" if $?;
+        print STDERR "$k:$res";
+    }
+
+    handle_recipe( { $r => { directory => $repo_dir, }, } );
+}
+
+if (@$yamls) {
+    $env->{DOCKER_COMPOSE_YML_OVERRIDE} = join( ' ', map {"-f $_"} @$yamls );
+}
+
+# output args for make command
+print join ' ', map {qq{$_="@{[$env->{$_}]}"}}
+    keys(%$env);

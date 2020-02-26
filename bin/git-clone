@@ -1,0 +1,23 @@
+#!/bin/bash -xe
+set -o pipefail
+
+repo=$1
+dir=$2
+branch=$3
+
+if [ ! -e $dir ]; then
+    git clone $repo $dir
+fi
+
+cd $dir
+git fetch --all --prune
+git fetch --tags --prune
+
+if [ "$UPDATE_BRANCH" = "yes" -o "$UPDATE_BRANCH" = "1" ] && [ -n "$branch" ]; then
+    git checkout .
+    git clean -f
+    git checkout $branch
+    if git symbolic-ref --short HEAD 2>/dev/null; then
+      git rebase $(git rev-parse --abbrev-ref --symbolic-full-name @{u})
+    fi
+fi
