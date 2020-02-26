@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin;
+use lib "$FindBin::Bin/local/lib/perl5";
+use Cwd qw(realpath);
+use YAML::Tiny qw(LoadFile DumpFile);
+use File::Temp qw(tmpnam);
+
+my $recipe_dir = realpath("$FindBin::Bin/../recipe");
+my $repo_base_dir = realpath("$FindBin::Bin/../..");
+
+my $recipe = shift @ARGV
+    or return;
+my $recipe_file = "$recipe_dir/$recipe.yaml";
+
+if (realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file) {
+    die qq{Can not find recipe for "$recipe".};
+};
+
+
+my $env = {};
+my $data = LoadFile($recipe_file);
+
+
+# detect docker images
+$env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-@{[delete $data->{perl}]}";
+$env->{DOCKER_MYSQL_IMAGE} = delete $data->{database};
+
+
+# checout branch and collect links
+my @volumes;
+for my $k (keys %$data) {
+    my $repo = $data->{$k}{location};
+    (my $dir = $repo) =~ s{.*/}{};
+
+    my $cmd = <<CMD;
+cd $repo_base_dir &&
+    ([ -e $dir ] || git clone $repo) &&
+    cd $dir &&
+    git fetch &&
+    git checkout @{[$data->{$k}{branch}]}
+CMD
+    my $res = `$cmd 2>&1`;
+    print STDERR $res;
+    die "Got an error: $cmd" if $?;
+
+    for my $l (@{$data->{$k}{links} || []}) {
+        push @volumes, "      - '$repo_base_dir/$k/$l:/var/www/cgi-bin/mt/$l'";
+    }
+}
+
+my ($fh, $file) = tmpnam();
+print $fh <<YAML;
+version: "3"
+services:
+  mt:
+    volumes:
+@{[join "\n", @volumes]}
+YAML
+close $fh;
+$env->{DOCKER_COMPOSE_YML_OVERRIDE} = "-f $file";
+
+
+# output args for make command
+print join ' ',
+    map { qq{$_="@{[$env->{$_}]}"} }
+    keys(%$env);

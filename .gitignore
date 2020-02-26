@@ -1,0 +1,4 @@
+/node_modules
+/.vagrant
+.DS_Store
+/mt-config.cgi
