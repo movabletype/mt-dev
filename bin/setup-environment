@@ -27,8 +27,12 @@ my $data = LoadFile($recipe_file);
 
 
 # detect docker images
-$env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-@{[delete $data->{perl}]}";
-$env->{DOCKER_MYSQL_IMAGE} = delete $data->{database};
+if (my $perl = delete $data->{perl}) {
+    $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
+}
+if (my $mysql = delete $data->{database}) {
+    $env->{DOCKER_MYSQL_IMAGE} = $mysql;
+}
 
 
 # checout branch and collect links
@@ -57,7 +61,10 @@ my ($fh, $file) = tmpnam();
 print $fh <<YAML;
 version: "3"
 services:
-  mt:
+  httpd:
+    volumes:
+@{[join "\n", @volumes]}
+  psgi:
     volumes:
 @{[join "\n", @volumes]}
 YAML

@@ -41,7 +41,7 @@ setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
 
 exec-mysql:
-	docker-compose -f ./mt/common.yml -f ./mt/cgi.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_OPT}
+	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_OPT}
 
 up-cgi: MT_RUN_VIA=cgi
 up-cgi: up-common
@@ -79,7 +79,7 @@ up-common-with-recipe:
 	${MAKE} ${OPTS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
 down:
-	docker-compose -f ./mt/common.yml -f ./mt/psgi.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} down
+	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} down
 
 build:
 	${MAKE} -C docker

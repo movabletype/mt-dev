@@ -12,6 +12,11 @@ services:
       - "${MT_HOME_PATH:-../../movabletype}/mt-static:/var/www/html/mt-static"
       - "support:/var/www/cgi-bin/mt/mt-static/support"
       - "support:/var/www/html/mt-static/support"
+    ports:
+      - "${HTTPD_EXPOSE_PORT:-80}:80"
+    command: "/usr/sbin/httpd -D FOREGROUND"
+  psgi:
+    image: busybox
 
 volumes:
   site:

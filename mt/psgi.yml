@@ -2,22 +2,17 @@ version: "3"
 services:
   httpd:
     volumes:
-      # for psgi
       - "./cgi-bin-mt.htaccess:/var/www/cgi-bin/mt/.htaccess"
-    ports:
-      - "${HTTPD_EXPOSE_PORT:-80}:80"
-    command: "/usr/sbin/httpd -D FOREGROUND"
   psgi:
     working_dir: /var/www/cgi-bin/mt
     command:
-      [
-        "starman",
-        "-E",
-        "production",
-        "--workers=2",
-        "--pid=/tmp/mt.psgi.pid",
-        "/var/www/cgi-bin/mt/mt.psgi",
-      ]
+      - "starman"
+      - "-E"
+      - "production"
+      - "--workers=2"
+      - "--pid=/tmp/mt.psgi.pid"
+      - "/var/www/cgi-bin/mt/mt.psgi"
+
     # same as httpd
     image: ${DOCKER_MT_IMAGE:-movabletype/dev:perl-5.20}
     restart: always
