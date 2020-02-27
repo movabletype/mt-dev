@@ -1,8 +1,9 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 export BASE_SITE_PATH=${MAKEFILE_DIR}/../site
-export DOCKER_COMPOSE_YML_MIDDLEWARE=-f ./mt/mysql.yml -f ./mt/memcached.yml
-export DOCKER_COMPOSE_UP_OPT=-d
+export DOCKER_COMPOSE=docker-compose
+export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
+export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
 export MT_CONFIG_CGI=${MAKEFILE_DIR}/${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 
@@ -15,6 +16,7 @@ export DOCKER_MT_IMAGE
 export DOCKER_MYSQL_IMAGE
 export MT_RUN_VIA
 
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
 BASE_PACKAGE_PATH=${MAKEFILE_DIR}/package
 
 .PHONY: db up down
@@ -22,14 +24,14 @@ BASE_PACKAGE_PATH=${MAKEFILE_DIR}/package
 up: up-cgi
 
 init-repo:
-	[ -d ${MT_HOME_PATH} ] || \
+	[ -e ${MT_HOME_PATH} ] || \
 		git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
 
 fixup:
 	@for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
 		fp=${MT_HOME_PATH}/$$f; \
 		[ -d $$fp ] && rmdir $$fp || true; \
-		[ -f $$fp ] && [ `wc -c < $$fp` -eq "0" ] && rm -f $$fp || true; \
+		[ -f $$fp ] && perl -e 'exit((stat(shift))[7] == 0 ? 0 : 1)' $$fp && rm -f $$fp || true; \
 	done
 
 setup-mysql-volume:
@@ -37,11 +39,12 @@ setup-mysql-volume:
 
 
 ifneq (${SQL},)
-MYSQL_COMMAND_OPT=-e '${SQL}'
+MYSQL_COMMAND_ARGS=-e '${SQL}'
 endif
 
 exec-mysql:
-	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_OPT}
+	${_DC} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_ARGS}
+
 
 up-cgi: MT_RUN_VIA=cgi
 up-cgi: up-common
@@ -58,7 +61,7 @@ endif
 
 up-common-without-recipe:
 ifneq (${PACKAGE},)
-	$(eval MT_HOME_PATH = $(shell mktemp -d -t mt-dev.XXXXXXXXXX))
+	$(eval MT_HOME_PATH=$(shell mktemp -d -t mt-dev.XXXXXXXXXX))
 	chmod 777 ${MT_HOME_PATH}
 	@cd ${MT_HOME_PATH} && tar zxf ${BASE_PACKAGE_PATH}/${PACKAGE} || unzip ${BASE_PACKAGE_PATH}/${PACKAGE}
 	mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
@@ -71,20 +74,25 @@ up-common-invoke-docker-compose: down init-repo fixup setup-mysql-volume
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	@echo DOCKER_MYSQL_VOLUME=${DOCKER_MYSQL_VOLUME}
-	docker-compose -f ./mt/common.yml -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} ${DOCKER_COMPOSE_YML_OVERRIDE} up ${DOCKER_COMPOSE_UP_OPT}
+	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
 
 up-common-with-recipe:
-	$(eval OPTS=$(shell ./bin/setup-environment ${RECIPE}))
-	[ `echo -n ${OPTS} | wc -c | sed -e 's/ *//'` -gt 10 ]
-	${MAKE} ${OPTS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
+	$(eval export _ARGS=$(shell ./bin/setup-environment ${RECIPE}))
+	perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
+	${MAKE} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
 
 ifneq (${REMOVE_VOLUME},)
-DOWN_COMMAND_OPT=-v
+DOWN_ARGS=-v
 endif
 
 down:
-	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} down ${DOWN_COMMAND_OPT}
+	${_DC} down ${DOWN_ARGS}
+
+
+docker-compose:
+	${_DC} ${ARGS}
+
 
 build:
 	${MAKE} -C docker
