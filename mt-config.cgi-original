@@ -42,11 +42,4 @@ DefaultLanguage ja
 BaseSitePath /var/www/html
 PIDFilePath /tmp/mt.psgi.pid
 
-MailTransfer    smtp
-SMTPServer      email-smtp.us-west-2.amazonaws.com
-SMTPPort        587
-SMTPAuth        starttls
-SMTPUser        AKIAIMDIBXI5QIR4CBJQ
-SMTPPassword    AhWKU59r/+1wjQfHFAPAWjfXdYlCjF2Ir/u0GQp1TKHp
-
 MemcachedServers memcached:11211
