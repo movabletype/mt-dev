@@ -62,9 +62,10 @@ endif
 up-common-without-recipe:
 ifneq (${PACKAGE},)
 	$(eval MT_HOME_PATH=$(shell mktemp -d -t mt-dev.XXXXXXXXXX))
-	chmod 777 ${MT_HOME_PATH}
+	@echo MT_HOME_PATH=${MT_HOME_PATH}
+	@chmod 777 ${MT_HOME_PATH}
 	@cd ${MT_HOME_PATH} && tar zxf ${BASE_PACKAGE_PATH}/${PACKAGE} || unzip ${BASE_PACKAGE_PATH}/${PACKAGE}
-	mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
+	@perl -e 'opendir(my $$dh, "${MT_HOME_PATH}"); exit(scalar(@e = readdir($$dh)) > 3 ? 0 : 1)' || mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 
