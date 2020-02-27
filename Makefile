@@ -17,7 +17,7 @@ export DOCKER_MYSQL_IMAGE
 export MT_RUN_VIA
 
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
-BASE_PACKAGE_PATH=${MAKEFILE_DIR}/package
+BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 
 .PHONY: db up down
 
@@ -60,11 +60,11 @@ else
 endif
 
 up-common-without-recipe:
-ifneq (${PACKAGE},)
+ifneq (${ARCHIVE},)
 	$(eval MT_HOME_PATH=$(shell mktemp -d -t mt-dev.XXXXXXXXXX))
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@chmod 777 ${MT_HOME_PATH}
-	@cd ${MT_HOME_PATH} && tar zxf ${BASE_PACKAGE_PATH}/${PACKAGE} || unzip ${BASE_PACKAGE_PATH}/${PACKAGE}
+	@cd ${MT_HOME_PATH} && tar zxf ${BASE_ARCHIVE_PATH}/${ARCHIVE} || unzip ${BASE_ARCHIVE_PATH}/${ARCHIVE}
 	@perl -e 'opendir(my $$dh, "${MT_HOME_PATH}"); exit(scalar(@e = readdir($$dh)) > 3 ? 0 : 1)' || mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}

@@ -29,14 +29,14 @@ https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe
 $ make -C mt-dev RECIPE=7.2
 ```
 
-### PACKAGE
+### ARCHIVE
 
-（これは多分動く）
+（これは多分動くと思ったが、今色々調整中）
 
 zipやtar.tzでの指定。
-packageディレクトリにファイルを入れ、以下のように指定する。
+archiveディレクトリにファイルとパッチを入れ、以下のように指定する。
 
 ```
 # 仮想環境
-$ make -C mt-dev PACKAGE=MT7-R4605.zip
+$ make -C mt-dev ARCHIVE="MT7-R4605.zip a-patch.zip"
 ```
