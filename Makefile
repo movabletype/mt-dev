@@ -66,7 +66,7 @@ ifneq (${PACKAGE},)
 	@cd ${MT_HOME_PATH} && tar zxf ${BASE_PACKAGE_PATH}/${PACKAGE} || unzip ${BASE_PACKAGE_PATH}/${PACKAGE}
 	mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
 endif
-	${MAKE} up-common-invoke-docker-compose
+	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 
 up-common-invoke-docker-compose: down init-repo fixup setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
