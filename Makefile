@@ -10,10 +10,6 @@ ifneq (${WITHOUT_MT_CONFIG_CGI},)
 export MT_CONFIG_CGI_DEST_PATH=/tmp/mt-config.cgi
 endif
 
-ifneq (${SQL},)
-MYSQL_COMMAND_OPT=-e '${SQL}'
-endif
-
 export DOCKER_MT_IMAGE
 export DOCKER_MYSQL_IMAGE
 export MT_HOME_PATH
@@ -39,6 +35,11 @@ fixup:
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
+
+
+ifneq (${SQL},)
+MYSQL_COMMAND_OPT=-e '${SQL}'
+endif
 
 exec-mysql:
 	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_OPT}
@@ -78,8 +79,13 @@ up-common-with-recipe:
 	[ `echo -n ${OPTS} | wc -c | sed -e 's/ *//'` -gt 10 ]
 	${MAKE} ${OPTS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
+
+ifneq (${REMOVE_VOLUME},)
+DOWN_COMMAND_OPT=-v
+endif
+
 down:
-	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} down
+	docker-compose -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARE} down ${DOWN_COMMAND_OPT}
 
 build:
 	${MAKE} -C docker
