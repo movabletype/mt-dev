@@ -3,6 +3,7 @@ MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 export BASE_SITE_PATH=${MAKEFILE_DIR}/../site
 export DOCKER_COMPOSE_YML_MIDDLEWARE=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export DOCKER_COMPOSE_UP_OPT=-d
+export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
 export MT_CONFIG_CGI=${MAKEFILE_DIR}/${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 
 WITHOUT_MT_CONFIG_CGI=
@@ -12,7 +13,6 @@ endif
 
 export DOCKER_MT_IMAGE
 export DOCKER_MYSQL_IMAGE
-export MT_HOME_PATH
 export MT_RUN_VIA
 
 BASE_PACKAGE_PATH=${MAKEFILE_DIR}/package
@@ -22,13 +22,12 @@ BASE_PACKAGE_PATH=${MAKEFILE_DIR}/package
 up: up-cgi
 
 init-repo:
-	@cd .. ; \
-		[ -d movabletype ] || \
-			git clone git@github.com:movabletype/movabletype;
+	[ -d ${MT_HOME_PATH} ] || \
+		git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
 
 fixup:
 	@for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
-		fp=../movabletype/$$f; \
+		fp=${MT_HOME_PATH}/$$f; \
 		[ -d $$fp ] && rmdir $$fp || true; \
 		[ -f $$fp ] && [ `wc -c < $$fp` -eq "0" ] && rm -f $$fp || true; \
 	done
