@@ -1,4 +1,4 @@
 version: "3"
 services:
   memcached:
-    image: memcached:1.5.22-alpine
+    image: ${DOCKER_MEMCACHED_IMAGE:-memcached:1.5.22-alpine}

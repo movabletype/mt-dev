@@ -14,6 +14,7 @@ endif
 
 export DOCKER_MT_IMAGE
 export DOCKER_MYSQL_IMAGE
+export DOCKER_MEMCACHED_IMAGE
 export MT_RUN_VIA
 
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
@@ -69,6 +70,11 @@ ifneq (${ARCHIVE},)
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 
+up-common-with-recipe:
+	$(eval export _ARGS=$(shell ./bin/setup-environment ${RECIPE}))
+	perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
+	${MAKE} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
+
 up-common-invoke-docker-compose: down init-repo fixup setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
@@ -76,11 +82,6 @@ up-common-invoke-docker-compose: down init-repo fixup setup-mysql-volume
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	@echo DOCKER_MYSQL_VOLUME=${DOCKER_MYSQL_VOLUME}
 	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
-
-up-common-with-recipe:
-	$(eval export _ARGS=$(shell ./bin/setup-environment ${RECIPE}))
-	perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
-	${MAKE} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
 
 ifneq (${REMOVE_VOLUME},)

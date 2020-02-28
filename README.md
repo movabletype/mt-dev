@@ -33,10 +33,27 @@ $ make -C mt-dev RECIPE=7.2
 
 （これは多分動くと思ったが、今色々調整中）
 
-zipやtar.tzでの指定。
+zipやtar.gzでの指定。
 archiveディレクトリにファイルとパッチを入れ、以下のように指定する。
 
 ```
 # 仮想環境
 $ make -C mt-dev ARCHIVE="MT7-R4605.zip a-patch.zip"
+```
+
+### その他
+
+mt-config.cgi は、 mt-dev/mt-config.cgi （またはなければ mt-config.cgi-original）が使われる。
+
+```
+$ make -C mt-dev up                                       # dafault
+$ make -C mt-dev up-psgi                                  # enable PSGI environment
+$ make -C mt-dev down                                     # stop MT
+$ make -C mt-dev down REMOVE_VOLUME=1                     # stop MT and remove all databases
+$ make -C mt-dev UP_ARGS=""                               # run in forground
+$ make -C mt-dev docker-compose ARGS="logs -f"            # execute docker-compose command
+$ make -C mt-dev MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
+$ make -C mt-dev DOCKER_MT_IMAGE=custom-mt-docker-image
+$ make -C mt-dev DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
+$ make -C mt-dev DOCKER_MEMCACHED_IMAGE=busybox           # memcached is stopped
 ```
