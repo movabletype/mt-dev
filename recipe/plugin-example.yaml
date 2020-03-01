@@ -5,4 +5,5 @@ core:
   branch: develop
 mt-plugin-shared-preview:
   location: git@github.com:movabletype/mt-plugin-shared-preview
+  directory: mt-plugin-shared-preview
   branch: develop
