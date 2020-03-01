@@ -87,7 +87,18 @@ for my $k ( keys %$data ) {
     die "$res\nGot an error: git rev-parse HEAD" if $?;
     print STDERR "$k:$res";
 
-    for my $l ( @{ $data->{$k}{links} || [] } ) {
+    next if $k eq 'core';
+
+    my $links = $data->{$k}{links};
+    if (!$links) {
+        $links = [map { $_ =~ s{\A$dest_dir/}{}; $_ } (
+            glob("$dest_dir/*.cgi"),
+            glob("$dest_dir/plugins/*"),
+            glob("$dest_dir/mt-static/plugins/*"),
+        )];
+    }
+
+    for my $l (@$links) {
         push @volumes, "      - '$dest_dir/$l:/var/www/cgi-bin/mt/$l'";
     }
 }

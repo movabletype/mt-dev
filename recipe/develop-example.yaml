@@ -1,0 +1,15 @@
+perl: 5.20
+database: mariadb:10.1
+core:
+  location: git@github.com:movabletype/movabletype
+  branch: develop
+mt-theme-rainier:
+  location: git@github.com:movabletype/mt-theme-rainier
+  branch: develop
+  links:
+  - themes/rainier
+mt-theme-eiger:
+  location: git@github.com:movabletype/mt-theme-eiger
+  branch: develop
+  links:
+  - themes/eiger

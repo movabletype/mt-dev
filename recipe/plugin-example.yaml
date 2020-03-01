@@ -1,0 +1,8 @@
+perl: 5.20
+database: mariadb:10.1
+core:
+  location: git@github.com:movabletype/movabletype
+  branch: develop
+mt-plugin-shared-preview:
+  location: git@github.com:movabletype/mt-plugin-shared-preview
+  branch: develop
