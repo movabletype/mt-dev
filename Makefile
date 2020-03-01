@@ -1,6 +1,6 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-export BASE_SITE_PATH=${MAKEFILE_DIR}/../site
+export BASE_SITE_PATH=${MAKEFILE_DIR}/site
 export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
 export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
