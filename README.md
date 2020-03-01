@@ -9,11 +9,12 @@ $ vagrant up
 $ vagrant ssh
 # 仮想環境
 $ cd mt-dev
-$ make RECIPE=7.2
+$ make
+# yes/no を聞かれたら yes を答える
 $ make exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
 ```
 
-http://192.168.7.25/cgi-bin/mt/mt.cgi を開くと7.2のインストール画面になる。
+http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面になる。デフォルトではaddonsもなしの https://github.com/movabletype/movabletype 。
 
 ### RECIPE
 

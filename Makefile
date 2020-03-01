@@ -62,11 +62,11 @@ else
 endif
 
 up-common-without-recipe:
+	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 ifneq (${ARCHIVE},)
 	${MAKE} down-mt-home-volume
-	# TODO random name
+	# TBD: random name?
 	$(eval MT_HOME_PATH=mt-dev-mt-home-tmp)
-	${DOCKER} volume create --label mt-dev-mt-home-tmp ${MT_HOME_PATH}
 	${MAKEFILE_DIR}/bin/extract-archive ${BASE_ARCHIVE_PATH} ${MT_HOME_PATH} $(shell echo ${ARCHIVE} | tr ',' '\n')
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
