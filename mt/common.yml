@@ -9,10 +9,8 @@ services:
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
       - "${MT_CONFIG_CGI:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
       - "${BASE_SITE_PATH:-site}:/var/www/html"
-      - "${MT_HOME_PATH:-../../movabletype}/mt-static:/var/www/html/mt-static"
       - "support:/var/www/cgi-bin/mt/mt-static/support"
-      - "support:/var/www/html/mt-static/support"
-  httpd: &mt
+  httpd:
     <<: *mt
     ports:
       - "${HTTPD_EXPOSE_PORT:-80}:80"
@@ -23,3 +21,5 @@ volumes:
     driver: local
   support:
     driver: local
+  mt-dev-mt-home-tmp:
+    external: true

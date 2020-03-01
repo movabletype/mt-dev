@@ -1,0 +1,20 @@
+#!/bin/sh -e
+set -o pipefail
+
+if type md5sum >/dev/null 2>&1; then
+    md5=md5sum
+else
+    md5=md5
+fi
+
+script_dir=$(cd $(dirname $0); pwd)
+base=$1; shift
+dest=$1; shift
+
+script=extract-archive-on-docker
+
+for f in "$@"; do
+    path=$base/$f
+    $md5 $path
+    docker run --rm -v $dest:/dest -v $path:/archive/$f -v $script_dir/$script:/usr/local/bin/$script -w /dest busybox:uclibc /usr/local/bin/$script /dest /archive/$f
+done

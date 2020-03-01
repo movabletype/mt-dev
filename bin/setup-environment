@@ -6,58 +6,92 @@ use utf8;
 
 use FindBin;
 use lib "$FindBin::Bin/local/lib/perl5";
-use Cwd qw(realpath);
-use YAML::Tiny qw(LoadFile DumpFile);
-use File::Temp qw(tmpnam);
 
-my $recipe_dir = realpath("$FindBin::Bin/../recipe");
+use Cwd qw(realpath);
+use HTTP::Tiny;
+use Config::Tiny;
+use YAML::Tiny qw(LoadFile DumpFile);
+use File::Spec::Functions qw(catfile);
+use File::Temp qw(tempfile tmpnam);
+
+my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
+my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
 my $recipe = shift @ARGV
     or return;
 my $recipe_file = "$recipe_dir/$recipe.yaml";
 
-if (realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file) {
-    die qq{Can not find recipe for "$recipe".};
-};
+if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
+    $recipe_file = "";
+    my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
 
+    my $conf = Config::Tiny->read( $conf_file, 'utf8' );
+    if ( !$conf ) {
+        $conf = Config::Tiny->new;
 
-my $env = {};
-my $data = LoadFile($recipe_file);
+        print STDOUT "Please input base URL of recipe data: ";
+        my $base = <STDIN>;
+        chomp $base;
 
+        $conf->{recipe}{base_url} = $base;
+        $conf->write( $conf_file, 'utf8' );
+    }
 
-# detect docker images
-if (my $perl = delete $data->{perl}) {
-    $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
-}
-if (my $mysql = delete $data->{database}) {
-    $env->{DOCKER_MYSQL_IMAGE} = $mysql;
-}
+    if ( $conf->{recipe}{base_url} ) {
+        my $base_url = $conf->{recipe}{base_url};
+        $base_url =~ s/\/+$//;
+        my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
+        die "Failed!\n"
+            unless $response->{success} && length $response->{content};
 
+        my ( $fh, $filename ) = tempfile();
+        print $fh $response->{content};
 
-# checout branch and collect links
-my @volumes;
-for my $k (keys %$data) {
-    my $repo = $data->{$k}{location};
-    (my $dir = $repo) =~ s{.*/}{};
+        $recipe_file = $filename;
+    }
 
-    my $cmd = <<CMD;
-cd $repo_base_dir &&
-    ([ -e $dir ] || git clone $repo) &&
-    cd $dir &&
-    git fetch &&
-    git checkout @{[$data->{$k}{branch}]}
-CMD
-    my $res = `$cmd 2>&1`;
-    print STDERR $res;
-    die "Got an error: $cmd" if $?;
-
-    for my $l (@{$data->{$k}{links} || []}) {
-        push @volumes, "      - '$repo_base_dir/$k/$l:/var/www/cgi-bin/mt/$l'";
+    if ( !$recipe_file ) {
+        die qq{Can not find recipe for "$recipe".};
     }
 }
 
-my ($fh, $file) = tmpnam();
+my $env  = {};
+my $data = LoadFile($recipe_file);
+
+# detect docker images
+if ( my $perl = delete $data->{perl} ) {
+    $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
+}
+if ( my $mysql = delete $data->{database} ) {
+    $env->{DOCKER_MYSQL_IMAGE} = $mysql;
+}
+
+# checout branch and collect links
+my @volumes;
+for my $k ( keys %$data ) {
+    my $repo = $data->{$k}{location};
+    ( my $dir = $repo ) =~ s{.*/}{};
+    my $dest_dir = "$repo_base_dir/$dir";
+
+    if ( $k eq 'core' ) {
+        $env->{MT_HOME_PATH} = $dest_dir;
+    }
+
+    my $cmd = "$git_clone_cmd $repo $dest_dir @{[$data->{$k}{branch} || '']}";
+    my $res = `$cmd 2>&1` || "";
+    die "$res\nGot an error: $cmd" if $?;
+
+    $res = `cd $repo_base_dir/$dir && git rev-parse HEAD 2>&1`;
+    die "$res\nGot an error: git rev-parse HEAD" if $?;
+    print STDERR "$k:$res";
+
+    for my $l ( @{ $data->{$k}{links} || [] } ) {
+        push @volumes, "      - '$dest_dir/$l:/var/www/cgi-bin/mt/$l'";
+    }
+}
+
+my ( $fh, $file ) = tmpnam();
 print $fh <<YAML;
 version: "3"
 services:
@@ -71,8 +105,6 @@ YAML
 close $fh;
 $env->{DOCKER_COMPOSE_YML_OVERRIDE} = "-f $file";
 
-
 # output args for make command
-print join ' ',
-    map { qq{$_="@{[$env->{$_}]}"} }
+print join ' ', map {qq{$_="@{[$env->{$_}]}"}}
     keys(%$env);

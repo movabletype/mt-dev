@@ -1,6 +1,7 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 export BASE_SITE_PATH=${MAKEFILE_DIR}/../site
+export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
 export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS=-d
@@ -25,7 +26,7 @@ BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 up: up-cgi
 
 init-repo:
-	[ -e ${MT_HOME_PATH} ] || \
+	@[ -e ${MT_HOME_PATH} ] || \
 		git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
 
 fixup:
@@ -53,7 +54,7 @@ up-cgi: up-common
 up-psgi: MT_RUN_VIA=psgi
 up-psgi: up-common
 
-up-common:
+up-common: down
 ifeq (${RECIPE},)
 	${MAKE} up-common-without-recipe
 else
@@ -62,20 +63,20 @@ endif
 
 up-common-without-recipe:
 ifneq (${ARCHIVE},)
-	$(eval MT_HOME_PATH=$(shell mktemp -d -t mt-dev.XXXXXXXXXX))
-	@echo MT_HOME_PATH=${MT_HOME_PATH}
-	@chmod 777 ${MT_HOME_PATH}
-	@cd ${MT_HOME_PATH} && tar zxf ${BASE_ARCHIVE_PATH}/${ARCHIVE} || unzip ${BASE_ARCHIVE_PATH}/${ARCHIVE}
-	@perl -e 'opendir(my $$dh, "${MT_HOME_PATH}"); exit(scalar(@e = readdir($$dh)) > 3 ? 0 : 1)' || mv ${MT_HOME_PATH}/*/* ${MT_HOME_PATH}
+	${MAKE} down-mt-home-volume
+	# TODO random name
+	$(eval MT_HOME_PATH=mt-dev-mt-home-tmp)
+	${DOCKER} volume create --label mt-dev-mt-home-tmp ${MT_HOME_PATH}
+	${MAKEFILE_DIR}/bin/extract-archive ${BASE_ARCHIVE_PATH} ${MT_HOME_PATH} $(shell echo ${ARCHIVE} | tr ',' '\n')
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 
 up-common-with-recipe:
-	$(eval export _ARGS=$(shell ./bin/setup-environment ${RECIPE}))
-	perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
-	${MAKE} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
+	$(eval export _ARGS=$(shell ${MAKEFILE_DIR}/bin/setup-environment ${RECIPE}))
+	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
+	${MAKE} up-common-invoke-docker-compose ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
-up-common-invoke-docker-compose: down init-repo fixup setup-mysql-volume
+up-common-invoke-docker-compose: init-repo fixup setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
@@ -90,6 +91,12 @@ endif
 
 down:
 	${_DC} down ${DOWN_ARGS}
+	${MAKE} down-mt-home-volume
+
+down-mt-home-volume:
+	@for v in `docker volume ls -f label=mt-dev-mt-home-tmp | sed -e '1d' | awk '{print $$2}'`; do \
+		docker volume rm $$v; \
+	done
 
 
 docker-compose:

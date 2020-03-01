@@ -1,0 +1,17 @@
+#!/bin/sh -xe
+set -o pipefail
+
+repo=$1
+dir=$2
+branch=$3
+
+if [ !-e $dir ]; then
+    git clone $repo $dir
+fi
+
+cd $dir
+git fetch
+
+if [ -n "$branch" ]; then
+    git checkout $branch
+fi
