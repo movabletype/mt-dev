@@ -26,7 +26,7 @@ https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe
 
 ```
 # 仮想環境
-$ make RECIPE=develop
+$ make RECIPE=7.2
 ```
 
 ### ARCHIVE
