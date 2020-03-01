@@ -5,7 +5,7 @@ repo=$1
 dir=$2
 branch=$3
 
-if [ !-e $dir ]; then
+if [ ! -e $dir ]; then
     git clone $repo $dir
 fi
 
