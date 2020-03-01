@@ -99,6 +99,10 @@ down-mt-home-volume:
 	done
 
 
+clean-config:
+	rm ~/.mt-dev.conf
+
+
 docker-compose:
 	${_DC} ${ARGS}
 

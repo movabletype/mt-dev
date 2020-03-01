@@ -8,6 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/local/lib/perl5";
 
 use Cwd qw(realpath);
+use Data::Dumper;
 use HTTP::Tiny;
 use Config::Tiny;
 use YAML::Tiny qw(LoadFile DumpFile);
@@ -30,7 +31,7 @@ if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
     if ( !$conf ) {
         $conf = Config::Tiny->new;
 
-        print STDOUT "Please input base URL of recipe data: ";
+        print STDERR "Please input base URL of recipe data: ";
         my $base = <STDIN>;
         chomp $base;
 
@@ -42,7 +43,7 @@ if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
         my $base_url = $conf->{recipe}{base_url};
         $base_url =~ s/\/+$//;
         my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
-        die "Failed!\n"
+        die "Failed: @{[Dumper($response)]}"
             unless $response->{success} && length $response->{content};
 
         my ( $fh, $filename ) = tempfile();
