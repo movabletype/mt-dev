@@ -55,6 +55,7 @@ up-psgi: MT_RUN_VIA=psgi
 up-psgi: up-common
 
 up-common: down
+	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 ifeq (${RECIPE},)
 	${MAKE} up-common-without-recipe
 else
@@ -62,7 +63,6 @@ else
 endif
 
 up-common-without-recipe:
-	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 ifneq (${ARCHIVE},)
 	${MAKE} down-mt-home-volume
 	# TBD: random name?
