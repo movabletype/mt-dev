@@ -12,8 +12,9 @@ Vagrant.configure("2") do |config|
     apt-get update
     apt-get install -y make git zip \
       docker.io docker-compose \
-      mysql-client \
-      libio-socket-ssl-perl
+      mysql-client
+    # required by HTTP::Tiny
+    apt-get install -y libio-socket-ssl-perl
     adduser vagrant docker
   SHELL
 
