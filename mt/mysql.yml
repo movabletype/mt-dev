@@ -12,3 +12,5 @@ volumes:
     driver: local
   mysql8:
     driver: local
+  mysql5:
+    driver: local

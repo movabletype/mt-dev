@@ -23,6 +23,7 @@ my $recipe = shift @ARGV
     or return;
 my $recipe_file = "$recipe_dir/$recipe.yaml";
 
+# get recipe
 if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
     $recipe_file = "";
     my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
