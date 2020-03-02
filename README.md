@@ -53,5 +53,4 @@ $ make docker-compose ARGS="logs -f"            # execute docker-compose command
 $ make MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
 $ make DOCKER_MT_IMAGE=custom-mt-docker-image
 $ make DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
-$ make DOCKER_MEMCACHED_IMAGE=busybox           # memcached is stopped
 ```

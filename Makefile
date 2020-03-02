@@ -26,15 +26,17 @@ BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 up: up-cgi
 
 init-repo:
-	@[ -e ${MT_HOME_PATH} ] || \
-		git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
+	@perl -e 'exit($$ENV{MT_HOME_PATH} =~ m{/})' || \
+		[ -e ${MT_HOME_PATH} ] || \
+			git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
 
 fixup:
-	@for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
-		fp=${MT_HOME_PATH}/$$f; \
-		[ -d $$fp ] && rmdir $$fp || true; \
-		[ -f $$fp ] && perl -e 'exit((stat(shift))[7] == 0 ? 0 : 1)' $$fp && rm -f $$fp || true; \
-	done
+	@perl -e 'exit($$ENV{MT_HOME_PATH} =~ m{/})' || \
+		for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
+			fp=${MT_HOME_PATH}/$$f; \
+			[ -d $$fp ] && rmdir $$fp || true; \
+			[ -f $$fp ] && perl -e 'exit((stat(shift))[7] == 0 ? 0 : 1)' $$fp && rm -f $$fp || true; \
+		done
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
