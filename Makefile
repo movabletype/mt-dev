@@ -109,5 +109,11 @@ docker-compose:
 	${_DC} ${ARGS}
 
 
+# aliases
+
+logs: ARGS=logs
+logs: docker-compose
+
+
 build:
 	${MAKE} -C docker

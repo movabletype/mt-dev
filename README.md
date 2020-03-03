@@ -39,12 +39,12 @@ $ vagrant mt-dev up ARCHIVE="MT7-R4605.zip a-patch.zip"
 mt-config.cgi は、 mt-dev/mt-config.cgi （またはなければ mt-config.cgi-original）が使われる。
 
 ```
-$ vagrant mt-dev up                                       # dafault
-$ vagrant mt-dev up-psgi                                  # enable PSGI environment
-$ vagrant mt-dev down                                     # stop MT
-$ vagrant mt-dev down REMOVE_VOLUME=1                     # stop MT and remove all databases
+$ vagrant mt-dev up                                          # dafault
+$ vagrant mt-dev up-psgi                                     # enable PSGI environment
+$ vagrant mt-dev down                                        # stop MT
+$ vagrant mt-dev down REMOVE_VOLUME=1                        # stop MT and remove all databases
 $ vagrant mt-dev up UP_ARGS=""                               # run in forground
-$ vagrant mt-dev docker-compose ARGS="logs -f"            # execute docker-compose command
+$ vagrant mt-dev docker-compose ARGS="logs -f"               # execute docker-compose command
 $ vagrant mt-dev up MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
 $ vagrant mt-dev up DOCKER_MT_IMAGE=custom-mt-docker-image
 $ vagrant mt-dev up DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
