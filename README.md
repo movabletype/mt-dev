@@ -12,7 +12,7 @@ $ vagrant mt-dev up RECIPE=7.3
 $ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
 ```
 
-http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面になる。デフォルトではaddonsもなしの https://github.com/movabletype/movabletype 。
+http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面になる。上のコマンドでは7.3で起動（CGI版）
 
 ### RECIPE
 
