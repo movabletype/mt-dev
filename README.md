@@ -12,6 +12,7 @@ $ cd mt-dev
 $ make RECIPE=7.3
 # Please input base URL of recipe data と聞かれたら https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe を入力
 # yes/no を聞かれたら yes を答える
+# 完了後、20秒ほど待つ（mysqlの起動に時間がかかる）
 $ make exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
 ```
 
