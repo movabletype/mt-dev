@@ -8,6 +8,8 @@ Vagrant.configure("2") do |config|
   config.vm.network "private_network", ip: vm_private_network_ip
   config.vm.synced_folder ".", "/home/vagrant/mt-dev"
 
+  config.ssh.forward_agent = true
+
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y make git zip \
