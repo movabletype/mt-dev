@@ -9,7 +9,7 @@ $ vagrant up
 $ vagrant ssh
 # 仮想環境
 $ cd mt-dev
-$ make
+$ make RECIPE=7.3
 # yes/no を聞かれたら yes を答える
 $ make exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
 ```
