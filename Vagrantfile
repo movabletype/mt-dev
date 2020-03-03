@@ -13,6 +13,14 @@ class MtDevCommand < Vagrant.plugin(2, :command)
     command = "cd /home/vagrant/mt-dev && make " + argv
 
     with_target_vms(nil, single_target: true) do |vm|
+      if vm.state.id != :running
+        env = vm.action(:up)
+        if vm.state.id != :running
+          # got an error
+          return 1
+        end
+      end
+
       env = vm.action(:ssh_run, ssh_run_command: command, ssh_opts: { extra_args: %W(-q -t) })
 
       status = env[:ssh_run_exit_status] || 0
