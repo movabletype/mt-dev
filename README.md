@@ -6,14 +6,10 @@ Movable Type の開発環境
 
 ```
 $ vagrant up
-$ vagrant ssh
-# 仮想環境
-$ cd mt-dev
-$ make RECIPE=7.3
+$ vagrant mt-dev up RECIPE=7.3
 # Please input base URL of recipe data と聞かれたら https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe を入力
-# yes/no を聞かれたら yes を答える
 # 完了後、20秒ほど待つ（mysqlの起動に時間がかかる）
-$ make exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
+$ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8 */'
 ```
 
 http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面になる。デフォルトではaddonsもなしの https://github.com/movabletype/movabletype 。
@@ -28,7 +24,7 @@ https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe
 
 ```
 # 仮想環境
-$ make RECIPE=7.3
+$ vagrant mt-dev up RECIPE=7.3
 ```
 
 ### ARCHIVE
@@ -38,7 +34,7 @@ archiveディレクトリにファイルとパッチを入れ、以下のよう�
 
 ```
 # 仮想環境
-$ make ARCHIVE="MT7-R4605.zip a-patch.zip"
+$ vagrant mt-dev up ARCHIVE="MT7-R4605.zip a-patch.zip"
 ```
 
 ### その他
@@ -46,13 +42,13 @@ $ make ARCHIVE="MT7-R4605.zip a-patch.zip"
 mt-config.cgi は、 mt-dev/mt-config.cgi （またはなければ mt-config.cgi-original）が使われる。
 
 ```
-$ make up                                       # dafault
-$ make up-psgi                                  # enable PSGI environment
-$ make down                                     # stop MT
-$ make down REMOVE_VOLUME=1                     # stop MT and remove all databases
-$ make UP_ARGS=""                               # run in forground
-$ make docker-compose ARGS="logs -f"            # execute docker-compose command
-$ make MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
-$ make DOCKER_MT_IMAGE=custom-mt-docker-image
-$ make DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
+$ vagrant mt-dev up                                       # dafault
+$ vagrant mt-dev up-psgi                                  # enable PSGI environment
+$ vagrant mt-dev down                                     # stop MT
+$ vagrant mt-dev down REMOVE_VOLUME=1                     # stop MT and remove all databases
+$ vagrant mt-dev up UP_ARGS=""                               # run in forground
+$ vagrant mt-dev docker-compose ARGS="logs -f"            # execute docker-compose command
+$ vagrant mt-dev up MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
+$ vagrant mt-dev up DOCKER_MT_IMAGE=custom-mt-docker-image
+$ vagrant mt-dev up DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
 ```

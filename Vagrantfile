@@ -1,12 +1,41 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+class MtDevCommand < Vagrant.plugin(2, :command)
+  def execute
+    argv = @argv.join(" ")
+
+    if argv == ""
+      puts "Usage: vagrant mt-dev <sub-command>"
+      return 1
+    end
+
+    command = "cd /home/vagrant/mt-dev && make " + argv
+
+    with_target_vms(nil, single_target: true) do |vm|
+      env = vm.action(:ssh_run, ssh_run_command: command, ssh_opts: { extra_args: %W(-q -t) })
+
+      status = env[:ssh_run_exit_status] || 0
+      return status
+    end
+  end
+end
+
+class MtDev < Vagrant.plugin("2")
+  name "mt-dev"
+
+  command "mt-dev" do
+    MtDevCommand
+  end
+end
+
 vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.7.25"
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   config.vm.network "private_network", ip: vm_private_network_ip
   config.vm.synced_folder ".", "/home/vagrant/mt-dev"
+  config.vm.hostname = "mt-dev"
 
   config.ssh.forward_agent = true
 
