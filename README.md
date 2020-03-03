@@ -23,7 +23,6 @@ http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面にな
 https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe
 
 ```
-# 仮想環境
 $ vagrant mt-dev up RECIPE=7.3
 ```
 
@@ -33,7 +32,6 @@ zipやtar.gzでの指定。
 archiveディレクトリにファイルとパッチを入れ、以下のように指定する。
 
 ```
-# 仮想環境
 $ vagrant mt-dev up ARCHIVE="MT7-R4605.zip a-patch.zip"
 ```
 
