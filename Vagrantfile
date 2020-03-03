@@ -10,7 +10,9 @@ class MtDevCommand < Vagrant.plugin(2, :command)
   end
 
   def execute
-    argv = @argv.join(" ")
+    require "shellwords"
+
+    argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
 
     if argv == ""
       puts "Usage: vagrant mt-dev <sub-command>"
