@@ -2,6 +2,13 @@
 # vi: set ft=ruby :
 
 class MtDevCommand < Vagrant.plugin(2, :command)
+  def error(status)
+    print "\e[31m"
+    puts "Got error"
+    print "\e[0m"
+    return status
+  end
+
   def execute
     argv = @argv.join(" ")
 
@@ -16,15 +23,17 @@ class MtDevCommand < Vagrant.plugin(2, :command)
       if vm.state.id != :running
         env = vm.action(:up)
         if vm.state.id != :running
-          # got an error
-          return 1
+          return error(1)
         end
       end
 
       env = vm.action(:ssh_run, ssh_run_command: command, ssh_opts: { extra_args: %W(-q -t) })
 
       status = env[:ssh_run_exit_status] || 0
-      return status
+
+      return status if status == 0
+
+      return error(1)
     end
   end
 end
