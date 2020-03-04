@@ -2,6 +2,12 @@
 
 Movable Type の開発環境
 
+### 必要なもの
+
+* Git
+* Vagrant
+* VirtualBox
+
 ### 動かしてみる
 
 ```
