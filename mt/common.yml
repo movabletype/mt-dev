@@ -13,7 +13,7 @@ services:
       - "./mt-docker-entrypoint.sh:/usr/local/bin/mt-docker-entrypoint.sh"
 
   httpd:
-    image: ${DOCKER_HTTPD_IMAGE:-movabletype/dev:php-7.2}
+    image: ${DOCKER_HTTPD_IMAGE:-movabletype/dev:php-5.6}
     restart: always
     volumes:
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
