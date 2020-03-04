@@ -1,2 +1,2 @@
 RewriteEngine on
-RewriteRule (.*) http://psgi:5000/cgi-bin/mt/$1 [P,L]
+RewriteRule (.*) http://mt:80/cgi-bin/mt/$1 [P,L]

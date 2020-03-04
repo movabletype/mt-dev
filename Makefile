@@ -16,6 +16,7 @@ export MT_CONFIG_CGI_DEST_PATH=/tmp/mt-config.cgi
 endif
 
 export DOCKER_MT_IMAGE
+export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MEMCACHED_IMAGE
 export MT_RUN_VIA

@@ -68,6 +68,9 @@ if ( my $perl = delete $data->{perl} ) {
 if ( my $mysql = delete $data->{database} ) {
     $env->{DOCKER_MYSQL_IMAGE} = $mysql;
 }
+if ( my $php = delete $data->{php} ) {
+    $env->{DOCKER_HTTPD_IMAGE} = $php;
+}
 
 # checout branch and collect links
 my @volumes;
@@ -115,10 +118,10 @@ my ( $fh, $file ) = tmpnam();
 print $fh <<YAML;
 version: "3"
 services:
-  httpd:
+  mt:
     volumes:
 @{[join "\n", @volumes]}
-  psgi:
+  httpd:
     volumes:
 @{[join "\n", @volumes]}
 YAML

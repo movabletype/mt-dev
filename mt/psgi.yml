@@ -1,14 +1,12 @@
 version: "3"
 services:
-  httpd:
-    volumes:
-      - "./cgi-bin-mt.htaccess:/var/www/cgi-bin/mt/.htaccess"
-  psgi:
+  mt:
     working_dir: /var/www/cgi-bin/mt
     command:
       - "starman"
       - "-E"
       - "production"
+      - "--port=80"
       - "--workers=2"
       - "--pid=/tmp/mt.psgi.pid"
       - "/var/www/cgi-bin/mt/mt.psgi"
