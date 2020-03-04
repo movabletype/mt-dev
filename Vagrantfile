@@ -12,14 +12,27 @@ class MtDevCommand < Vagrant.plugin(2, :command)
   def execute
     require "shellwords"
 
-    argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
-
-    if argv == ""
+    if @argv.empty?
       puts "Usage: vagrant mt-dev <sub-command>"
       return 1
     end
 
-    command = "cd /home/vagrant/mt-dev && make " + argv
+    commands = []
+
+    if @argv[0] == 'copy-ssh-key'
+      file = @argv.delete_at(1)
+      commands += [
+        "mkdir -p /home/vagrant/.ssh",
+        "chmod 700 /home/vagrant/.ssh",
+        "chown vagrant:vagrant /home/vagrant/.ssh",
+        "echo -n #{Shellwords.shellescape(File.read(file))} > /home/vagrant/.ssh/id_rsa",
+        "chmod 600 /home/vagrant/.ssh/id_rsa",
+        "chown vagrant:vagrant /home/vagrant/.ssh/id_rsa"
+      ]
+    else
+      argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
+      commands.push("cd /home/vagrant/mt-dev && make " + argv)
+    end
 
     with_target_vms(nil, single_target: true) do |vm|
       if vm.state.id != :running
@@ -29,7 +42,7 @@ class MtDevCommand < Vagrant.plugin(2, :command)
         end
       end
 
-      env = vm.action(:ssh_run, ssh_run_command: command, ssh_opts: { extra_args: %W(-q -t) })
+      env = vm.action(:ssh_run, ssh_run_command: commands.join(' && '), ssh_opts: { extra_args: %W(-q -t) })
 
       status = env[:ssh_run_exit_status] || 0
 
