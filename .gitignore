@@ -1,5 +1,6 @@
 /node_modules
 /.vagrant
 /site
-.DS_Store
 /mt-config.cgi
+/.env
+.DS_Store

@@ -1,5 +1,7 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
+-include ${MAKEFILE_DIR}/.env
+
 export BASE_SITE_PATH=${MAKEFILE_DIR}/site
 export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
@@ -17,6 +19,7 @@ export DOCKER_MT_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MEMCACHED_IMAGE
 export MT_RUN_VIA
+export HTTPD_EXPOSE_PORT
 
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
 BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
