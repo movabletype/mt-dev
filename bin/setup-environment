@@ -69,7 +69,7 @@ if ( my $mysql = delete $data->{database} ) {
     $env->{DOCKER_MYSQL_IMAGE} = $mysql;
 }
 if ( my $php = delete $data->{php} ) {
-    $env->{DOCKER_HTTPD_IMAGE} = $php;
+    $env->{DOCKER_HTTPD_IMAGE} = "movabletype/dev:php-$php";
 }
 
 # checout branch and collect links
