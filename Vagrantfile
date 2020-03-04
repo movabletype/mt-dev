@@ -29,6 +29,10 @@ class MtDevCommand < Vagrant.plugin(2, :command)
         "chmod 600 /home/vagrant/.ssh/id_rsa",
         "chown vagrant:vagrant /home/vagrant/.ssh/id_rsa"
       ]
+    elsif @argv[0] == 'remove-ssh-key'
+      commands += [
+        "rm /home/vagrant/.ssh/id_rsa"
+      ]
     else
       argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
       commands.push("cd /home/vagrant/mt-dev && make " + argv)
