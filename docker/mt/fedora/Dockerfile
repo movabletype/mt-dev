@@ -1,5 +1,7 @@
 FROM movabletype/test:fedora
 
+ADD mt-static.conf /etc/httpd/conf.d/mt-static.conf
+
 RUN set -ex &&\
   \
   perl -i -pe \

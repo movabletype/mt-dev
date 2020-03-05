@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM docker-php-5.3-apache
 
 ADD mt-static.conf /etc/apache2/conf-available/
 

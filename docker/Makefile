@@ -7,6 +7,19 @@ build:
 		docker build -t movabletype/dev:php-$$v php/$$v; \
 	done
 
+build-php-5.3:
+	${MAKE} build-docker-php-5.3-apache
+	docker build -t movabletype/dev:php-5.3 php/5.3
+	${MAKE} remove-docker-php-5.3-apache
+
+build-docker-php-5.3-apache:
+	git clone git@github.com:cristianorsolin/docker-php-5.3-apache
+	docker build -t docker-php-5.3-apache docker-php-5.3-apache
+
+remove-docker-php-5.3-apache:
+	docker rmi docker-php-5.3-apache
+	/bin/rm -fr docker-php-5.3-apache
+
 push:
 	for t in \
 		movabletype/dev:buster  movabletype/dev:perl-5.28 \
