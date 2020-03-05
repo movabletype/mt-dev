@@ -39,6 +39,9 @@ Please execute this command first for copy your private key for github.
 $ vagrant mt-dev copy-ssh-key ~/.ssh/id_rsa
 
 ~/.ssh/id_rsa is a typical filename for your private key, gut your filename may be different.
+
+See also:
+https://github.com/movabletype/mt-dev/wiki/Troubleshooting
 MSG
           return 1
         end
