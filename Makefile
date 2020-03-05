@@ -108,6 +108,8 @@ down-mt-home-volume:
 clean-config:
 	rm ~/.mt-dev.conf
 
+clean-image: down
+	${DOCKER} images | grep movabletype/dev | awk '{ print $$3 }' | xargs ${DOCKER} rmi -f
 
 docker-compose:
 	${_DC} ${ARGS}
