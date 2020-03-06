@@ -14,5 +14,5 @@ git fetch --all --prune
 
 if [ -n "$branch" ]; then
     git checkout $branch
-    git pull
+    git rebase $(git rev-parse --abbrev-ref --symbolic-full-name @{u})
 fi
