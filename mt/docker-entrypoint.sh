@@ -1,5 +1,6 @@
 #!/bin/sh
 
+chmod 777 /var/www/html
 chmod 777 /var/www/cgi-bin/mt/mt-static/support
 
 if [ "$1" = "apache2-foreground" ]; then
