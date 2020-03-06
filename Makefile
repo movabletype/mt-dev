@@ -8,7 +8,10 @@ export DOCKER_COMPOSE=docker-compose
 export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
-export MT_CONFIG_CGI=${MAKEFILE_DIR}/${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
+
+MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
+MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
+export MT_CONFIG_CGI_SRC_PATH
 
 WITHOUT_MT_CONFIG_CGI=
 ifneq (${WITHOUT_MT_CONFIG_CGI},)
