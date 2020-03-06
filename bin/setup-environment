@@ -19,103 +19,109 @@ my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
 my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
-my $recipe = shift @ARGV
-    or return;
-my $recipe_file = "$recipe_dir/$recipe.yaml";
+return unless @ARGV;
 
-# get recipe
-if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
-    $recipe_file = "";
-    my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
+my $env   = {};
+my $yamls = [];
 
-    my $conf = Config::Tiny->read( $conf_file, 'utf8' );
-    if ( !$conf ) {
-        $conf = Config::Tiny->new;
+for my $recipe (@ARGV) {
+    my $recipe_file = "$recipe_dir/$recipe.yaml";
 
-        print STDERR "Please input base URL of recipe data: ";
-        my $base = <STDIN>;
-        chomp $base;
+    # get recipe
+    if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
+        $recipe_file = "";
+        my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
 
-        $conf->{recipe}{base_url} = $base;
-        $conf->write( $conf_file, 'utf8' );
+        my $conf = Config::Tiny->read( $conf_file, 'utf8' );
+        if ( !$conf ) {
+            $conf = Config::Tiny->new;
+
+            print STDERR "Please input base URL of recipe data: ";
+            my $base = <STDIN>;
+            chomp $base;
+
+            $conf->{recipe}{base_url} = $base;
+            $conf->write( $conf_file, 'utf8' );
+        }
+
+        if ( $conf->{recipe}{base_url} ) {
+            my $base_url = $conf->{recipe}{base_url};
+            $base_url =~ s/\/+$//;
+            my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
+            die "Failed: @{[Dumper($response)]}"
+                unless $response->{success} && length $response->{content};
+
+            my ( $fh, $filename ) = tempfile();
+            print $fh $response->{content};
+
+            $recipe_file = $filename;
+        }
+
+        if ( !$recipe_file ) {
+            die qq{Can not find recipe for "$recipe".};
+        }
     }
 
-    if ( $conf->{recipe}{base_url} ) {
-        my $base_url = $conf->{recipe}{base_url};
-        $base_url =~ s/\/+$//;
-        my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
-        die "Failed: @{[Dumper($response)]}"
-            unless $response->{success} && length $response->{content};
+    my $data = LoadFile($recipe_file);
 
-        my ( $fh, $filename ) = tempfile();
-        print $fh $response->{content};
-
-        $recipe_file = $filename;
+    # detect docker images
+    if ( my $perl = delete $data->{perl} ) {
+        $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
+    }
+    if ( my $mysql = delete $data->{database} ) {
+        $env->{DOCKER_MYSQL_IMAGE} = $mysql;
+    }
+    if ( my $php = delete $data->{php} ) {
+        $env->{DOCKER_HTTPD_IMAGE} = "movabletype/dev:php-$php";
     }
 
-    if ( !$recipe_file ) {
-        die qq{Can not find recipe for "$recipe".};
-    }
-}
+    # checout branch and collect links
+    my @volumes;
+    for my $k ( keys %$data ) {
+        my $repo     = $data->{$k}{location};
+        my $dest_dir = $data->{$k}{directory} || do {
+            ( my $dir = $repo ) =~ s{.*/}{};
+            "$repo_base_dir/$dir";
+        };
+        if ( $dest_dir !~ m{\A/} ) {
+            $dest_dir = "$repo_base_dir/$dest_dir";
+        }
 
-my $env  = {};
-my $data = LoadFile($recipe_file);
+        if ( $k eq 'core' ) {
+            $env->{MT_HOME_PATH} = $dest_dir;
+        }
 
-# detect docker images
-if ( my $perl = delete $data->{perl} ) {
-    $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
-}
-if ( my $mysql = delete $data->{database} ) {
-    $env->{DOCKER_MYSQL_IMAGE} = $mysql;
-}
-if ( my $php = delete $data->{php} ) {
-    $env->{DOCKER_HTTPD_IMAGE} = "movabletype/dev:php-$php";
-}
+        if ($repo) {
+            my $cmd
+                = "$git_clone_cmd $repo $dest_dir @{[$data->{$k}{branch} || '']}";
+            my $res = `$cmd 2>&1` || "";
+            die "$res\nGot an error: $cmd" if $?;
 
-# checout branch and collect links
-my @volumes;
-for my $k ( keys %$data ) {
-    my $repo = $data->{$k}{location};
-    my $dest_dir = $data->{$k}{directory} || do {
-        ( my $dir = $repo ) =~ s{.*/}{};
-        "$repo_base_dir/$dir";
-    };
-    if ($dest_dir !~ m{\A/}) {
-        $dest_dir = "$repo_base_dir/$dest_dir";
-    }
+            $res = `cd $dest_dir && git rev-parse HEAD 2>&1`;
+            die "$res\nGot an error: git rev-parse HEAD" if $?;
+            print STDERR "$k:$res";
+        }
 
-    if ( $k eq 'core' ) {
-        $env->{MT_HOME_PATH} = $dest_dir;
-    }
+        next if $k eq 'core';
 
-    if ($repo) {
-        my $cmd = "$git_clone_cmd $repo $dest_dir @{[$data->{$k}{branch} || '']}";
-        my $res = `$cmd 2>&1` || "";
-        die "$res\nGot an error: $cmd" if $?;
+        my $links = $data->{$k}{links};
+        if ( !$links ) {
+            $links = [
+                map { $_ =~ s{\A$dest_dir/}{}; $_ } (
+                    glob("$dest_dir/*.cgi"),
+                    glob("$dest_dir/plugins/*"),
+                    glob("$dest_dir/mt-static/plugins/*"),
+                )
+            ];
+        }
 
-        $res = `cd $dest_dir && git rev-parse HEAD 2>&1`;
-        die "$res\nGot an error: git rev-parse HEAD" if $?;
-        print STDERR "$k:$res";
-    }
-
-    next if $k eq 'core';
-
-    my $links = $data->{$k}{links};
-    if (!$links) {
-        $links = [map { $_ =~ s{\A$dest_dir/}{}; $_ } (
-            glob("$dest_dir/*.cgi"),
-            glob("$dest_dir/plugins/*"),
-            glob("$dest_dir/mt-static/plugins/*"),
-        )];
+        for my $l (@$links) {
+            push @volumes, "      - '$dest_dir/$l:/var/www/cgi-bin/mt/$l'";
+        }
     }
 
-    for my $l (@$links) {
-        push @volumes, "      - '$dest_dir/$l:/var/www/cgi-bin/mt/$l'";
-    }
-}
-
-my ( $fh, $file ) = tmpnam();
-print $fh <<YAML;
+    my ( $fh, $file ) = tmpnam();
+    print $fh <<YAML;
 version: "3"
 services:
   mt:
@@ -125,8 +131,14 @@ services:
     volumes:
 @{[join "\n", @volumes]}
 YAML
-close $fh;
-$env->{DOCKER_COMPOSE_YML_OVERRIDE} = "-f $file";
+    close $fh;
+
+    push @$yamls, $file;
+}
+
+if (@$yamls) {
+    $env->{DOCKER_COMPOSE_YML_OVERRIDE} = join( ' ', map {"-f $_"} @$yamls );
+}
 
 # output args for make command
 print join ' ', map {qq{$_="@{[$env->{$_}]}"}}
