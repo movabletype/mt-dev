@@ -11,7 +11,7 @@ Movable Type の開発環境
 ### 動かしてみる
 
 ```
-$ vagrant mt-dev check
+$ vagrant mt-dev check-ssh-key
 # OK! と出なかったら https://github.com/movabletype/mt-dev/wiki/Troubleshooting へ
 $ vagrant mt-dev up RECIPE=7.3
 # Please input base URL of recipe data と聞かれたら https://sakk-qa.s3-ap-northeast-1.amazonaws.com/movabletype/recipe を入力

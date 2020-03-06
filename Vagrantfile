@@ -19,7 +19,7 @@ class MtDevCommand < Vagrant.plugin(2, :command)
 
     commands = []
 
-    if @argv[0] == "check"
+    if @argv[0] == "check-ssh-key"
       with_target_vms(nil, single_target: true) do |vm|
         if vm.state.id != :running
           env = vm.action(:up)
