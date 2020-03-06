@@ -10,7 +10,7 @@ if [ ! -e $dir ]; then
 fi
 
 cd $dir
-git fetch
+git fetch --all --prune
 
 if [ -n "$branch" ]; then
     git checkout $branch
