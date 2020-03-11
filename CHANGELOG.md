@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.2] - 2020-03-11
 
+### Added
+
+* Enable to specify both RECIPE and ARCHIVE.
+  * `$ vagrant mt-dev up ARCHIVE=MTA7-R4605.tar.gz RECIPE=shared-preview`
+
 ### Changed
 
 * Update default software versions.
