@@ -1,12 +1,12 @@
 version: "3"
 services:
   db:
-    image: ${DOCKER_MYSQL_IMAGE:-mariadb:10.0}
+    image: ${DOCKER_MYSQL_IMAGE:-mysql:5.7.29}
     environment:
       MYSQL_ROOT_PASSWORD: password
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - "${DOCKER_MYSQL_VOLUME:-mariadb10}:/var/lib/mysql"
+      - "${DOCKER_MYSQL_VOLUME:-mysql5}:/var/lib/mysql"
 volumes:
   mariadb10:
     driver: local
