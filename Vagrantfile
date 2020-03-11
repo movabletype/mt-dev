@@ -134,6 +134,9 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provider "virtualbox" do |vb|
+    # required 2048 if openladap is enabled
+    vb.memory = ENV["VM_VB_MEMORY"] if ENV["VM_VB_MEMORY"]
+
     vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
   end
 end

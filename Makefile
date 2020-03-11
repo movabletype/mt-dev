@@ -22,6 +22,7 @@ export DOCKER_MT_IMAGE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MEMCACHED_IMAGE
+export DOCKER_LDAP_IMAGE
 export MT_RUN_VIA
 export HTTPD_EXPOSE_PORT
 
@@ -55,6 +56,10 @@ endif
 
 exec-mysql:
 	${_DC} exec db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_ARGS}
+
+# FIXME:
+exec-ldappasswd:
+	${_DC} exec ldap ldappasswd -x -D "cn=admin,dc=example,dc=com" -w secret "cn=Melody,ou=users,dc=example,dc=com" -S
 
 
 up-cgi: MT_RUN_VIA=cgi
