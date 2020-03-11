@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2020-03-11
+
+### Changed
+
+* Update default software versions.
+  * Perl : 5.28
+  * PHP : 7.3
+  * DB : MySQL 5.7
+
 ## [0.0.1] - 2020-03-09
 
 ### Added
