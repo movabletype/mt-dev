@@ -69,26 +69,22 @@ up-psgi: MT_RUN_VIA=psgi
 up-psgi: up-common
 
 up-common: down
-	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
-ifeq (${RECIPE},)
-	${MAKE} up-common-without-recipe
-else
-	${MAKE} up-common-with-recipe
-endif
-
-up-common-without-recipe:
-ifneq (${ARCHIVE},)
 	${MAKE} down-mt-home-volume
+	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
+
+ifneq (${ARCHIVE},)
 	# TBD: random name?
 	$(eval MT_HOME_PATH=mt-dev-mt-home-tmp)
 	${MAKEFILE_DIR}/bin/extract-archive ${BASE_ARCHIVE_PATH} ${MT_HOME_PATH} $(shell echo ${ARCHIVE} | tr ',' '\n')
 endif
-	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 
-up-common-with-recipe:
+ifeq (${RECIPE},)
+	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
+else
 	$(eval export _ARGS=$(shell ${MAKEFILE_DIR}/bin/setup-environment $(shell echo ${RECIPE} | tr ',' '\n')))
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
-	${MAKE} up-common-invoke-docker-compose ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
+	${MAKE} up-common-invoke-docker-compose ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}") MT_HOME_PATH=${MT_HOME_PATH}
+endif
 
 up-common-invoke-docker-compose: init-repo fixup setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
