@@ -6,6 +6,7 @@ build:
 	for v in 5.4 5.5 7.1 7.2 7.4; do \
 		docker build -t movabletype/dev:php-$$v php/$$v; \
 	done
+	docker build -t movabletype/dev:openldap ldap/openldap
 
 build-php-5.3:
 	${MAKE} build-docker-php-5.3-apache
@@ -34,6 +35,7 @@ push:
 		movabletype/dev:php-7.2 \
 		movabletype/dev:php-7.3 \
 		movabletype/dev:php-7.4 \
+		movabletype/dev:openldap \
 	; do \
 		docker push $$t; \
 	done
