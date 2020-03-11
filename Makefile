@@ -104,7 +104,7 @@ DOWN_ARGS=-v
 endif
 
 down:
-	${_DC} down ${DOWN_ARGS}
+	${_DC} down --remove-orphans ${DOWN_ARGS}
 	${MAKE} down-mt-home-volume
 
 down-mt-home-volume:
