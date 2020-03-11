@@ -10,5 +10,6 @@ RUN set -ex &&\
 
 RUN set -ex &&\
   \
-  cpm install -g Starman &&\
+  cpm install -g \
+    Starman Net::LDAP &&\
   rm -fr /root/.perl-cpm/
