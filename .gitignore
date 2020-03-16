@@ -4,5 +4,6 @@
 /mt-config.cgi
 /mt-config.cgi-*
 /.env
+/.env-*
 /.ssh-config
 .DS_Store

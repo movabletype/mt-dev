@@ -1,7 +1,5 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
--include ${MAKEFILE_DIR}/.env
-
 export BASE_SITE_PATH=${MAKEFILE_DIR}/site
 export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
@@ -10,13 +8,7 @@ export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
 
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
-MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
-export MT_CONFIG_CGI_SRC_PATH
-
-WITHOUT_MT_CONFIG_CGI=
-ifneq (${WITHOUT_MT_CONFIG_CGI},)
-export MT_CONFIG_CGI_DEST_PATH=/tmp/mt-config.cgi
-endif
+BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 
 export DOCKER_MT_IMAGE
 export DOCKER_HTTPD_IMAGE
@@ -27,8 +19,23 @@ export MT_RUN_VIA
 export HTTPD_EXPOSE_PORT
 export PLACKUP
 
+
+# override variables
+ENV_FILE=.env
+-include ${MAKEFILE_DIR}/${ENV_FILE}
+
+
+# setup internal variables
+
+MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
+export MT_CONFIG_CGI_SRC_PATH
+
+ifneq (${WITHOUT_MT_CONFIG_CGI},)
+export MT_CONFIG_CGI_DEST_PATH=/tmp/mt-config.cgi
+endif
+
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
-BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
+
 
 .PHONY: db up down
 

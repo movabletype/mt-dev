@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+* Tweaks .env file feature.
+
 ## [0.0.3] - 2020-03-16
 
 ### Added
