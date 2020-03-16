@@ -65,3 +65,10 @@ You can edit codes using VSCode by following steps.
 1. `$ vagrant mt-dev publish-ssh-config`
     * "${mt-dev-dir}/.ssh-config" has been generated.
 1. Open "mt-dev" ssh target in VSCode with "${mt-dev-dir}/.ssh-config".
+
+### sshfs
+
+1. `$ vagrant mt-dev publish-ssh-config`
+    * "${mt-dev-dir}/.ssh-config" has been generated.
+1. `$ sshfs -F ${PWD}/.ssh-config mt-dev:. src`
+1. Edit src/path/to/file
