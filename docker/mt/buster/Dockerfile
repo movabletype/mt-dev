@@ -21,7 +21,7 @@ RUN set -ex &&\
 RUN set -ex &&\
   \
   cpm install -g \
-    Starman Net::LDAP &&\
+    Starman Linux::Inotify2 Net::LDAP &&\
   rm -fr /root/.perl-cpm/
 
 ENV APACHE_RUN_DIR /var/run/apache2

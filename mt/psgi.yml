@@ -2,11 +2,4 @@ version: "3"
 services:
   mt:
     working_dir: /var/www/cgi-bin/mt
-    command:
-      - "starman"
-      - "-E"
-      - "production"
-      - "--port=80"
-      - "--workers=2"
-      - "--pid=/tmp/mt.psgi.pid"
-      - "/var/www/cgi-bin/mt/mt.psgi"
+    command: "${PLACKUP:-starman -E production -MCGI -MFile::Spec -MCGI::Cookie -MLWP::UserAgent -MHTML::Entities -MScalar::Util -MDBI -MDBD::mysql -L Shotgun -R /var/www/cgi-bin/mt --port=80 --workers=2 --pid=/tmp/mt.psgi.pid} /var/www/cgi-bin/mt/mt.psgi"
