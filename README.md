@@ -58,9 +58,11 @@ $ vagrant mt-dev up DOCKER_MT_IMAGE=custom-mt-docker-image
 $ vagrant mt-dev up DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
 ```
 
-### VSCode remote development integration
+### Development
 
-You can edit codes using VSCode by following steps.
+#### VSCode
+
+You can edit codes using "Visual Studio Code Remote Development".
 
 1. `$ vagrant mt-dev publish-ssh-config`
     * "${mt-dev-dir}/.ssh-config" has been generated.
