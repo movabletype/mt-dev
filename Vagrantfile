@@ -9,6 +9,15 @@ class MtDevCommand < Vagrant.plugin(2, :command)
     return status
   end
 
+  def with_captured_stdout
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    yield
+    $stdout.string
+  ensure
+    $stdout = original_stdout
+  end
+
   def execute
     require "shellwords"
 
@@ -75,6 +84,20 @@ MSG
       commands += [
         "rm /home/vagrant/.ssh/id_rsa",
       ]
+    elsif @argv[0] == "publish-ssh-config"
+      config = with_captured_stdout do
+        Vagrant.plugin("2").manager.commands["ssh-config".to_sym][0].call.new(%W(--host mt-dev), @env).execute
+      end
+
+      config_file = File.expand_path('.', '.ssh-config')
+      fh = File.open(config_file, 'w')
+      fh.puts config
+
+      puts "You can connect to mt-dev by using this config file.\n"
+      puts
+      puts config_file
+
+      return
     else
       argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
       commands.push("cd /home/vagrant/mt-dev && make " + argv)

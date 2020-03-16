@@ -2,5 +2,7 @@
 /.vagrant
 /site
 /mt-config.cgi
+/mt-config.cgi-*
 /.env
+/.ssh-config
 .DS_Store
