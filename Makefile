@@ -6,6 +6,7 @@ export DOCKER_COMPOSE=docker-compose
 export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
+export UPDATE_BRANCH=yes
 
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
@@ -89,7 +90,7 @@ endif
 ifeq (${RECIPE},)
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH}
 else
-	$(eval export _ARGS=$(shell ${MAKEFILE_DIR}/bin/setup-environment $(shell echo ${RECIPE} | tr ',' '\n')))
+	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment $(shell echo ${RECIPE} | tr ',' '\n')))
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 	${MAKE} up-common-invoke-docker-compose ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}") MT_HOME_PATH=${MT_HOME_PATH}
 endif

@@ -12,7 +12,7 @@ fi
 cd $dir
 git fetch --all --prune
 
-if [ -n "$branch" ]; then
+if [ "$UPDATE_BRANCH" = "yes" -o "$UPDATE_BRANCH" = "1" ] && [ -n "$branch" ]; then
     git checkout $branch
     git rebase $(git rev-parse --abbrev-ref --symbolic-full-name @{u})
 fi
