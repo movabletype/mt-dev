@@ -19,7 +19,7 @@ my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
 my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
-return unless @ARGV;
+exit unless @ARGV;
 
 my $env   = {};
 my $yamls = [];
@@ -111,6 +111,9 @@ for my $recipe (@ARGV) {
                     glob("$dest_dir/*.cgi"),
                     glob("$dest_dir/plugins/*"),
                     glob("$dest_dir/mt-static/plugins/*"),
+                    glob("$dest_dir/themes/*"),
+                    glob("$dest_dir/addons/*"),
+                    glob("$dest_dir/mt-static/addons/*"),
                 )
             ];
         }
