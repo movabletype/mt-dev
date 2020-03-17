@@ -76,19 +76,19 @@ You can edit codes using "Visual Studio Code Remote Development".
 1. `$ sshfs -F ${PWD}/.ssh-config mt-dev:. src`
 1. Edit src/path/to/file
 
-### `make` の実行による起動
+### トピックブランチの維持
 
-以下の環境が整っているLinuxやMacでは `vagrant mt-dev` を `make` に置き換えてローカル環境上で直接起動することもできる。
-
-* make コマンド
-* perl
-  * HTTP::Tiny
-    * IO::Socket::SSL などが入って https にリクエストできること
-* Docker環境
-  * Docker for Macも可
+デフォルトでは `$ vagrant mt-dev up RECIPE=...` を実行する度に指定されたブランチの最新に更新される。トッピックブランチを作成して作業している場合には、 `UPDATE_BRANCH=no` を指定するとブランチの更新がスキップされる。
 
 ```
-$ make up-psgi ARCHIVE=MT7-R4605.zip RECIPE=mt-plugin-MyAwsomePlugin MT_CONFIG_CGI=mt-config.cgi-local
+$ vagrant mt-dev up RECIPE=7.3 UPDATE_BRANCH=no
+```
+
+後述する .env ファイルに `UPDATE_BRANCH=no` を記述する形でもよい。.env ファイルで `UPDATE_BRANCH=no` を指定しているが、ブランチの更新も行いたい場合には `UPDATE_BRANCH=yes` を明示的に指定することで更新することができる。
+
+
+```
+$ vagrant mt-dev up RECIPE=6.x UPDATE_BRANCH=yes
 ```
 
 ### .env ファイルの利用
@@ -102,4 +102,19 @@ RECIPE=mt-plugin-MyAwsomePlugin
 MT_CONFIG_CGI=mt-config.cgi-local
 $ vagrant mt-dev up-psgi
 $ # または vagrant mt-dev up-psgi ENV_FILE=.env
+```
+
+### `make` の実行による起動
+
+以下の環境が整っているLinuxやMacでは `vagrant mt-dev` を `make` に置き換えてローカル環境上で直接起動することもできる。
+
+* make コマンド
+* perl
+  * HTTP::Tiny
+    * IO::Socket::SSL などが入って https にリクエストできること
+* Docker環境
+  * Docker for Macも可
+
+```
+$ make up-psgi ARCHIVE=MT7-R4605.zip RECIPE=mt-plugin-MyAwsomePlugin MT_CONFIG_CGI=mt-config.cgi-local
 ```
