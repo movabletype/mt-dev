@@ -92,7 +92,7 @@ ifeq (${RECIPE},)
 else
 	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment $(shell echo ${RECIPE} | tr ',' '\n')))
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
-	${MAKE} up-common-invoke-docker-compose ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}") MT_HOME_PATH=${MT_HOME_PATH}
+	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 endif
 
 up-common-invoke-docker-compose: init-repo setup-mysql-volume
