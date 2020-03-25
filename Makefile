@@ -99,7 +99,7 @@ up-common-invoke-docker-compose: init-repo setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
-	@echo DOCKER_HTTPD_IMAGE=${DOCKER_MT_IMAGE}
+	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
 
