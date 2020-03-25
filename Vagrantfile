@@ -141,8 +141,14 @@ vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.7.25"
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   config.vm.network "private_network", ip: vm_private_network_ip
-  config.vm.synced_folder ".", "/home/vagrant/mt-dev"
   config.vm.hostname = "mt-dev"
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  if RUBY_PLATFORM =~ /darwin/
+    config.vm.synced_folder ".", "/home/vagrant/mt-dev", type: "nfs", :mount_options => ["noatime", "vers=3", "udp", "nolock"]
+  else
+    config.vm.synced_folder ".", "/home/vagrant/mt-dev"
+  end
 
   config.ssh.forward_agent = true
 
