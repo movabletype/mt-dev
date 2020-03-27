@@ -18,6 +18,9 @@ if [ "$1" = "apache2-foreground" ]; then
         exec /usr/sbin/httpd -D FOREGROUND
     fi
 else
-    ( cd /var/www/cgi-bin/mt && make me )
+    if [ -e "/var/www/cgi-bin/mt/Makefile" ]; then
+        make -C /var/www/cgi-bin/mt me
+    fi
+
     exec "$@"
 fi
