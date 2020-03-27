@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Execute /usr/sbin/php-fpm on httpd container if available.
 * Use NFS for synced_folder on Mac.
 * Invoke `docker-compose pull` before each `docker-compose up`.
+* Invoke `make me` before run.
 
 ## [0.0.4] - 2020-03-17
 
