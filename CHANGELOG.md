@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2020-04-01
+
+### Added
+
+* Enable to invoke ./tools/*.pl by `vagrant mt-dev mt-shell`.
+
 ### Changed
 
 * Improve packup command wrapper.
