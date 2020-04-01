@@ -11,6 +11,17 @@ export UPDATE_BRANCH=yes
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 
+# shortcuts.
+ifneq (${PHP},)
+DOCKER_HTTPD_IMAGE=movabletype/dev:php-${PHP}
+endif
+ifneq (${PERL},)
+DOCKER_MT_IMAGE=movabletype/dev:perl-${5.20}
+endif
+ifneq (${DB},)
+DOCKER_MYSQL_IMAGE=${DB}
+endif
+
 export DOCKER_MT_IMAGE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE

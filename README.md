@@ -54,8 +54,9 @@ $ vagrant mt-dev down REMOVE_VOLUME=1                        # stop MT and remov
 $ vagrant mt-dev up UP_ARGS=""                               # run in forground
 $ vagrant mt-dev docker-compose ARGS="logs -f"               # execute docker-compose command
 $ vagrant mt-dev up MT_HOME_PATH="/home/vagrant/custom-mt"   # run custom-mt
+$ vagrant mt-dev up PERL=5.28 PHP=7.3
+$ vagrant mt-dev up DB=mariadb:10.5.1-bionic # use MariaDB 10.5.1
 $ vagrant mt-dev up DOCKER_MT_IMAGE=custom-mt-docker-image
-$ vagrant mt-dev up DOCKER_MYSQL_IMAGE=mariadb:10.5.1-bionic # use MariaDB 10.5.1
 ```
 
 
