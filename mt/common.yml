@@ -3,7 +3,8 @@ services:
   mt:
     image: ${DOCKER_MT_IMAGE:-movabletype/dev:perl-5.28}
     restart: always
-    entrypoint: "/usr/local/bin/docker-entrypoint.sh"
+    working_dir: /var/www/cgi-bin/mt
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
     volumes:
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
       - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
