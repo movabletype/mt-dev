@@ -19,6 +19,7 @@ export DOCKER_LDAP_IMAGE
 export MT_RUN_VIA
 export HTTPD_EXPOSE_PORT
 export PLACKUP
+export CMD
 
 
 # override variables
@@ -133,6 +134,14 @@ docker-compose:
 
 logs: ARGS=logs
 logs: docker-compose
+
+ifeq (${CMD},)
+mt-shell: ARGS=exec mt /bin/bash
+mt-shell: docker-compose
+else
+mt-shell:
+	${_DC} exec -e CMD mt /bin/bash -c "$$CMD"
+endif
 
 
 build:
