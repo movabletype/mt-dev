@@ -155,10 +155,12 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y make git zip \
-      docker.io docker-compose \
+      docker.io \
       mysql-client
     # required by HTTP::Tiny
     apt-get install -y libio-socket-ssl-perl
+    curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
     adduser vagrant docker
   SHELL
 
