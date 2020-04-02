@@ -8,6 +8,14 @@ Movable Type の開発環境
 * Vagrant
 * VirtualBox
 
+### サポートしているOS
+
+* Windows
+* macOS
+    * Catalinaの場合は[wiki](https://github.com/movabletype/mt-dev/wiki/Troubleshooting#macos-catalina)を参照してください
+* Linux
+    * Linuxの場合にはVagrantを使わずに、直接makeコマンドで実行する形がおすすめです
+
 ### 動かしてみる
 
 ```
