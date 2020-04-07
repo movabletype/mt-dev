@@ -1,6 +1,7 @@
 FROM movabletype/test:centos6
 
-ADD mt-static.conf /etc/httpd/conf.d/mt-static.conf
+ADD core.conf /etc/httpd/conf.d/
+ADD mt-static.conf /etc/httpd/conf.d/
 
 RUN set -ex &&\
   \

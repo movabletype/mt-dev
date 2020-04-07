@@ -10,13 +10,14 @@ RUN set -ex &&\
 # invoke apache2 via /usr/bin/httpd
   ln -s /usr/sbin/apache2 /usr/sbin/httpd
 
+ADD core.conf /etc/apache2/conf-available/
 ADD var-www.conf /etc/apache2/conf-available/
 RUN set -ex &&\
   \
   a2dismod mpm_event &&\
   a2enmod mpm_prefork cgi php5 rewrite proxy proxy_http &&\
   a2disconf serve-cgi-bin &&\
-  a2enconf var-www
+  a2enconf core var-www
 
 RUN set -ex &&\
   \
