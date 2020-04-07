@@ -18,3 +18,5 @@ for f in "$@"; do
     $md5 $path
     docker run --rm -v $dest:/dest -v $path:/archive/$f -v $script_dir/$script:/usr/local/bin/$script -w /dest busybox:uclibc /usr/local/bin/$script /dest /archive/$f
 done
+
+docker run --rm -v $dest:/dest busybox:uclibc ls /dest/mt.cgi > /dev/null
