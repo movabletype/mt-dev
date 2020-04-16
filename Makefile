@@ -16,7 +16,7 @@ ifneq (${PHP},)
 DOCKER_HTTPD_IMAGE=movabletype/dev:php-${PHP}
 endif
 ifneq (${PERL},)
-DOCKER_MT_IMAGE=movabletype/dev:perl-${5.20}
+DOCKER_MT_IMAGE=movabletype/dev:perl-${PERL}
 endif
 ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
