@@ -152,6 +152,12 @@ mt-shell:
 	${_DC} exec -e CMD mt /bin/bash -c "$$CMD"
 endif
 
+cpan-install:
+	${_DC} exec mt cpm install -g ${ARGS}
+
+cpan-uninstall:
+	${_DC} exec mt bash -c "cpm install -g App::cpanminus && cpanm -fU ${ARGS}"
+
 
 build:
 	${MAKE} -C docker
