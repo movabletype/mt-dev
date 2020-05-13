@@ -91,7 +91,7 @@ ext-repos以下にMovable Typeの一般的なディレクトリ構成のプラ�
 
 ```
 $ git clone git@github.com:movabletype/mt-plugin-shared-preview.git ext-repos/mt-plugin-shared-preview
-$ vagrant mt-dev up RECIPE=7.3 UPDATE_BRANCH=no
+$ vagrant mt-dev up RECIPE=7.3
 ```
 
 ### トピックブランチの維持
