@@ -2,6 +2,7 @@
 
 chmod 777 /var/www/html
 chmod 777 /var/www/cgi-bin/mt/mt-static/support
+chmod 777 /var/www/cgi-bin/mt/theme
 
 if [ "$1" = "apache2-foreground" ]; then
     rm -f /var/log/apache2/access.log # disable access logging
