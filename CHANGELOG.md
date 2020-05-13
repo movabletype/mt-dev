@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8] - 2020-05-13
+
+### Added
+
+* Add ext-repos feature.
+* Add cpan-install / cpan-uninstall command
+* Add cp-R command
+
+### Fixed
+
+* Avoid errors in theme export
+
 ## [0.0.7] - 2020-04-16
 
 * Extend timeout for waiting response from MT at httpd.
