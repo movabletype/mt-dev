@@ -158,6 +158,10 @@ cpan-install:
 cpan-uninstall:
 	${_DC} exec mt bash -c "cpm install -g App::cpanminus && cpanm -fU ${ARGS}"
 
+cp-R:
+	mkdir -p ${TO}
+	${_DC} exec -T mt tar -C ${FROM} -zcf - . | tar -C ${TO} -zxf -
+
 
 build:
 	${MAKE} -C docker
