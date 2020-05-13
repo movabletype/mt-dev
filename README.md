@@ -85,6 +85,15 @@ You can edit codes using "Visual Studio Code Remote Development".
 1. `$ sshfs -F ${PWD}/.ssh-config mt-dev:. src`
 1. Edit src/path/to/file
 
+### ローカルのプラグインの参照
+
+ext-repos以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて `$ vagrant mt-dev up` を実行すると、そのプラグインがインストールされた状態で起動される。
+
+```
+$ git clone git@github.com:movabletype/mt-plugin-shared-preview.git ext-repos/mt-plugin-shared-preview
+$ vagrant mt-dev up RECIPE=7.3 UPDATE_BRANCH=no
+```
+
 ### トピックブランチの維持
 
 デフォルトでは `$ vagrant mt-dev up RECIPE=...` を実行する度に指定されたブランチの最新に更新される。トッピックブランチを作成して作業している場合には、 `UPDATE_BRANCH=no` を指定するとブランチの更新がスキップされる。

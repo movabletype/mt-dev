@@ -18,51 +18,13 @@ use File::Temp qw(tempfile tmpnam);
 my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
 my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
-
-exit unless @ARGV;
+my $ext_repos_dir = realpath("$FindBin::Bin/../ext-repos");
 
 my $env   = {};
 my $yamls = [];
 
-for my $recipe (@ARGV) {
-    my $recipe_file = "$recipe_dir/$recipe.yaml";
-
-    # get recipe
-    if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
-        $recipe_file = "";
-        my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
-
-        my $conf = Config::Tiny->read( $conf_file, 'utf8' );
-        if ( !$conf ) {
-            $conf = Config::Tiny->new;
-
-            print STDERR "Please input base URL of recipe data: ";
-            my $base = <STDIN>;
-            chomp $base;
-
-            $conf->{recipe}{base_url} = $base;
-            $conf->write( $conf_file, 'utf8' );
-        }
-
-        if ( $conf->{recipe}{base_url} ) {
-            my $base_url = $conf->{recipe}{base_url};
-            $base_url =~ s/\/+$//;
-            my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
-            die "Failed: @{[Dumper($response)]}"
-                unless $response->{success} && length $response->{content};
-
-            my ( $fh, $filename ) = tempfile();
-            print $fh $response->{content};
-
-            $recipe_file = $filename;
-        }
-
-        if ( !$recipe_file ) {
-            die qq{Can not find recipe for "$recipe".};
-        }
-    }
-
-    my $data = LoadFile($recipe_file);
+sub handle_recipe {
+    my $data = shift;
 
     # detect docker images
     if ( my $perl = delete $data->{perl} ) {
@@ -137,6 +99,55 @@ YAML
     close $fh;
 
     push @$yamls, $file;
+}
+
+for my $recipe (@ARGV) {
+    my $recipe_file = "$recipe_dir/$recipe.yaml";
+
+    # get recipe
+    if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
+        $recipe_file = "";
+        my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
+
+        my $conf = Config::Tiny->read( $conf_file, 'utf8' );
+        if ( !$conf ) {
+            $conf = Config::Tiny->new;
+
+            print STDERR "Please input base URL of recipe data: ";
+            my $base = <STDIN>;
+            chomp $base;
+
+            $conf->{recipe}{base_url} = $base;
+            $conf->write( $conf_file, 'utf8' );
+        }
+
+        if ( $conf->{recipe}{base_url} ) {
+            my $base_url = $conf->{recipe}{base_url};
+            $base_url =~ s/\/+$//;
+            my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
+            die "Failed: @{[Dumper($response)]}"
+                unless $response->{success} && length $response->{content};
+
+            my ( $fh, $filename ) = tempfile();
+            print $fh $response->{content};
+
+            $recipe_file = $filename;
+        }
+
+        if ( !$recipe_file ) {
+            die qq{Can not find recipe for "$recipe".};
+        }
+    }
+
+    handle_recipe(LoadFile($recipe_file));
+}
+
+for my $d (glob("$ext_repos_dir/*")) {
+    handle_recipe({
+        $d => {
+            directory => $d,
+        },
+    });
 }
 
 if (@$yamls) {
