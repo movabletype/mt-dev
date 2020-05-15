@@ -66,22 +66,27 @@ sub handle_recipe {
 
         next if $k eq 'core';
 
+        my $plugin_dir = $dest_dir;
+        if ($data->{$k}{prefix}) {
+            $plugin_dir = catfile($plugin_dir, $data->{$k}{prefix});
+        }
+
         my $links = $data->{$k}{links};
         if ( !$links ) {
             $links = [
-                map { $_ =~ s{\A$dest_dir/}{}; $_ } (
-                    glob("$dest_dir/*.cgi"),
-                    glob("$dest_dir/plugins/*"),
-                    glob("$dest_dir/mt-static/plugins/*"),
-                    glob("$dest_dir/themes/*"),
-                    glob("$dest_dir/addons/*"),
-                    glob("$dest_dir/mt-static/addons/*"),
+                map { $_ =~ s{\A$plugin_dir/}{}; $_ } (
+                    glob("$plugin_dir/*.cgi"),
+                    glob("$plugin_dir/plugins/*"),
+                    glob("$plugin_dir/mt-static/plugins/*"),
+                    glob("$plugin_dir/themes/*"),
+                    glob("$plugin_dir/addons/*"),
+                    glob("$plugin_dir/mt-static/addons/*"),
                 )
             ];
         }
 
         for my $l (@$links) {
-            push @volumes, "      - '$dest_dir/$l:/var/www/cgi-bin/mt/$l'";
+            push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l'";
         }
     }
 
