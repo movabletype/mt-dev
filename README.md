@@ -50,6 +50,12 @@ archiveディレクトリにファイルとパッチを入れ、以下のよう�
 $ vagrant mt-dev up ARCHIVE="MT7-R4605.zip a-patch.zip"
 ```
 
+アーカイブのURLを直接指定することもできる。
+
+```
+$ vagrant mt-dev up ARCHIVE="MT7-R4605.zip https://github.com/movabletype/mt-plugin-shared-preview/releases/download/0.2/mt-plugin-shared-preview-0.2.zip"
+```
+
 ### その他
 
 mt-config.cgi は、 mt-dev/mt-config.cgi （またはなければ mt-config.cgi-original）が使われる。
@@ -85,13 +91,19 @@ You can edit codes using "Visual Studio Code Remote Development".
 1. `$ sshfs -F ${PWD}/.ssh-config mt-dev:. src`
 1. Edit src/path/to/file
 
-### ローカルのプラグインの参照
+### プラグインの参照
 
 repo以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて、ディレクトリ名をREPOとして指定すると、そのプラグインがインストールされた状態で起動される。
 
 ```
 $ git clone git@github.com:movabletype/mt-plugin-shared-preview.git repo/mt-plugin-shared-preview
 $ vagrant mt-dev up RECIPE=7.3 REPO=mt-plugin-shared-preview
+```
+
+gitのURLを直接指定することもできる。
+
+```
+$ vagrant mt-dev up RECIPE=7.3 REPO=git@github.com:movabletype/mt-plugin-shared-preview.git
 ```
 
 ### トピックブランチの維持
