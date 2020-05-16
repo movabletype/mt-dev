@@ -55,8 +55,8 @@ $ vagrant mt-dev up ARCHIVE="MT7-R4605.zip a-patch.zip"
 mt-config.cgi は、 mt-dev/mt-config.cgi （またはなければ mt-config.cgi-original）が使われる。
 
 ```
-$ vagrant mt-dev up                                          # dafault
-$ vagrant mt-dev up-psgi                                     # enable PSGI environment
+$ vagrant mt-dev up ARCHIVE=MT.tar.gz                        # dafault
+$ vagrant mt-dev up-psgi ARCHIVE=MT.tar.gz                   # enable PSGI environment
 $ vagrant mt-dev down                                        # stop MT
 $ vagrant mt-dev down REMOVE_VOLUME=1                        # stop MT and remove all databases
 $ vagrant mt-dev up UP_ARGS=""                               # run in forground
@@ -87,11 +87,11 @@ You can edit codes using "Visual Studio Code Remote Development".
 
 ### ローカルのプラグインの参照
 
-ext-repos以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて `$ vagrant mt-dev up` を実行すると、そのプラグインがインストールされた状態で起動される。
+local-repo以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて、ディレクトリ名をLOCAL_REPOとして指定すると、そのプラグインがインストールされた状態で起動される。
 
 ```
-$ git clone git@github.com:movabletype/mt-plugin-shared-preview.git ext-repos/mt-plugin-shared-preview
-$ vagrant mt-dev up RECIPE=7.3
+$ git clone git@github.com:movabletype/mt-plugin-shared-preview.git local-repo/mt-plugin-shared-preview
+$ vagrant mt-dev up RECIPE=7.3 LOCAL_REPO=mt-plugin-shared-preview
 ```
 
 ### トピックブランチの維持
