@@ -9,16 +9,22 @@ use lib "$FindBin::Bin/local/lib/perl5";
 
 use Cwd qw(realpath);
 use Data::Dumper;
+use Getopt::Long;
 use HTTP::Tiny;
 use Config::Tiny;
 use YAML::Tiny qw(LoadFile DumpFile);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempfile tmpnam);
 
-my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
-my $repo_base_dir = realpath("$FindBin::Bin/../..");
-my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
-my $ext_repos_dir = realpath("$FindBin::Bin/../ext-repos");
+GetOptions(
+    'recipe=s'     => \my $recipes,
+    'local-repo=s' => \my $local_repos,
+);
+
+my $recipe_dir     = realpath("$FindBin::Bin/../recipe");
+my $local_repo_dir = realpath("$FindBin::Bin/../local-repo");
+my $repo_base_dir  = realpath("$FindBin::Bin/../..");
+my $git_clone_cmd  = realpath("$FindBin::Bin/git-clone");
 
 my $env   = {};
 my $yamls = [];
@@ -67,8 +73,8 @@ sub handle_recipe {
         next if $k eq 'core';
 
         my $plugin_dir = $dest_dir;
-        if ($data->{$k}{prefix}) {
-            $plugin_dir = catfile($plugin_dir, $data->{$k}{prefix});
+        if ( $data->{$k}{prefix} ) {
+            $plugin_dir = catfile( $plugin_dir, $data->{$k}{prefix} );
         }
 
         my $links = $data->{$k}{links};
@@ -106,30 +112,43 @@ YAML
     push @$yamls, $file;
 }
 
-for my $recipe (@ARGV) {
-    my $recipe_file = "$recipe_dir/$recipe.yaml";
+for my $recipe ( split /\s+/, $recipes ) {
+    $recipe =~ s{\.yaml\z}{};
+    $recipe .= '.yaml';
+
+    my $recipe_file = "$recipe_dir/$recipe";
 
     # get recipe
-    if ( realpath($recipe_file) !~ m/^$recipe_dir/ || !-e $recipe_file ) {
+    if ( !-e $recipe_file || realpath($recipe_file) !~ m/^$recipe_dir/ ) {
         $recipe_file = "";
-        my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
 
-        my $conf = Config::Tiny->read( $conf_file, 'utf8' );
-        if ( !$conf ) {
-            $conf = Config::Tiny->new;
+        my $recipe_url = $recipe =~ m{\Ahttps?://} ? $recipe : do {
+            my $conf_file = catfile( $ENV{'HOME'}, '.mt-dev.conf' );
 
-            print STDERR "Please input base URL of recipe data: ";
-            my $base = <STDIN>;
-            chomp $base;
+            my $conf = Config::Tiny->read( $conf_file, 'utf8' );
+            if ( !$conf ) {
+                $conf = Config::Tiny->new;
 
-            $conf->{recipe}{base_url} = $base;
-            $conf->write( $conf_file, 'utf8' );
-        }
+                print STDERR "Please input base URL of recipe data: ";
+                my $base = <STDIN>;
+                chomp $base;
 
-        if ( $conf->{recipe}{base_url} ) {
-            my $base_url = $conf->{recipe}{base_url};
-            $base_url =~ s/\/+$//;
-            my $response = HTTP::Tiny->new->get("$base_url/$recipe.yaml");
+                $conf->{recipe}{base_url} = $base;
+                $conf->write( $conf_file, 'utf8' );
+            }
+
+            if ( $conf->{recipe}{base_url} ) {
+                my $base_url = $conf->{recipe}{base_url};
+                $base_url =~ s/\/+$//;
+                "$base_url/$recipe";
+            }
+            else {
+                "";
+            }
+        };
+
+        if ($recipe_url) {
+            my $response = HTTP::Tiny->new->get($recipe_url);
             die "Failed: @{[Dumper($response)]}"
                 unless $response->{success} && length $response->{content};
 
@@ -144,15 +163,18 @@ for my $recipe (@ARGV) {
         }
     }
 
-    handle_recipe(LoadFile($recipe_file));
+    handle_recipe( LoadFile($recipe_file) );
 }
 
-for my $d (glob("$ext_repos_dir/*")) {
-    handle_recipe({
-        $d => {
-            directory => $d,
-        },
-    });
+for my $r ( split /\s+/, $local_repos ) {
+    my $repo_dir = "$local_repo_dir/$r";
+
+    # get repo
+    if ( !-e $repo_dir || realpath($repo_dir) !~ m/^$local_repo_dir/ ) {
+        die qq{Can not find local-repo for "$r".};
+    }
+
+    handle_recipe( { $r => { directory => $repo_dir, }, } );
 }
 
 if (@$yamls) {
