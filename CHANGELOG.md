@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.10] - 2020-05-16
+
+### Changed
+
+* Removed "init-repo" target that doesn't needed.
+* Renewal ext-repos feature as local-repo feature.
+
 ## [0.0.9] - 2020-05-15
 
 ### Added
