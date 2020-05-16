@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11] - 2020-05-16
+
+### Changed
+
+* Renewal local-repo feature as repo feature.
+
+### Added
+
+* Enable to specify GIT URL to REPO variable.
+* Enable to specify ARCHIVE URL to ARCHIVE variable.
+
 ## [0.0.10] - 2020-05-16
 
 ### Changed
