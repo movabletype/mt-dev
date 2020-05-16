@@ -54,11 +54,6 @@ _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
 
 up: up-cgi
 
-init-repo:
-	@perl -e 'exit($$ENV{MT_HOME_PATH} =~ m{/})' || \
-		[ -e ${MT_HOME_PATH} ] || \
-			git clone git@github.com:movabletype/movabletype ${MT_HOME_PATH};
-
 fixup:
 	@perl -e 'exit($$ENV{MT_HOME_PATH} =~ m{/})' || \
 		for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
@@ -105,7 +100,7 @@ ifneq (${RECIPE},)
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
-up-common-invoke-docker-compose: init-repo setup-mysql-volume
+up-common-invoke-docker-compose: setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
