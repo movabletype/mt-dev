@@ -13,18 +13,19 @@ use Getopt::Long;
 use HTTP::Tiny;
 use Config::Tiny;
 use YAML::Tiny qw(LoadFile DumpFile);
+use File::Basename qw(basename);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempfile tmpnam);
 
 GetOptions(
-    'recipe=s'     => \my $recipes,
-    'local-repo=s' => \my $local_repos,
+    'recipe=s' => \my $recipes,
+    'repo=s'   => \my $repos,
 );
 
-my $recipe_dir     = realpath("$FindBin::Bin/../recipe");
-my $local_repo_dir = realpath("$FindBin::Bin/../local-repo");
-my $repo_base_dir  = realpath("$FindBin::Bin/../..");
-my $git_clone_cmd  = realpath("$FindBin::Bin/git-clone");
+my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
+my $repo_dir      = realpath("$FindBin::Bin/../repo");
+my $repo_base_dir = realpath("$FindBin::Bin/../..");
+my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
 my $env   = {};
 my $yamls = [];
@@ -166,12 +167,21 @@ for my $recipe ( split /\s+/, $recipes ) {
     handle_recipe( LoadFile($recipe_file) );
 }
 
-for my $r ( split /\s+/, $local_repos ) {
-    my $repo_dir = "$local_repo_dir/$r";
+for my $r ( split /\s+/, $repos ) {
+    my $repo_dir = "$repo_dir/$r";
 
     # get repo
-    if ( !-e $repo_dir || realpath($repo_dir) !~ m/^$local_repo_dir/ ) {
-        die qq{Can not find local-repo for "$r".};
+    if ( !-e $repo_dir || realpath($repo_dir) !~ m/^$repo_dir/ ) {
+        my $k = basename($r);
+        $repo_dir = catfile( $repo_base_dir, $k );
+
+        my $cmd = "$git_clone_cmd $r $repo_dir";
+        my $res = `$cmd 2>&1` || "";
+        die "$res\nGot an error: $cmd" if $?;
+
+        $res = `cd $repo_dir && git rev-parse HEAD 2>&1`;
+        die "$res\nGot an error: git rev-parse HEAD" if $?;
+        print STDERR "$k:$res";
     }
 
     handle_recipe( { $r => { directory => $repo_dir, }, } );

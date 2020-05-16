@@ -87,11 +87,11 @@ You can edit codes using "Visual Studio Code Remote Development".
 
 ### ローカルのプラグインの参照
 
-local-repo以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて、ディレクトリ名をLOCAL_REPOとして指定すると、そのプラグインがインストールされた状態で起動される。
+repo以下にMovable Typeの一般的なディレクトリ構成のプラグインを置いて、ディレクトリ名をREPOとして指定すると、そのプラグインがインストールされた状態で起動される。
 
 ```
-$ git clone git@github.com:movabletype/mt-plugin-shared-preview.git local-repo/mt-plugin-shared-preview
-$ vagrant mt-dev up RECIPE=7.3 LOCAL_REPO=mt-plugin-shared-preview
+$ git clone git@github.com:movabletype/mt-plugin-shared-preview.git repo/mt-plugin-shared-preview
+$ vagrant mt-dev up RECIPE=7.3 REPO=mt-plugin-shared-preview
 ```
 
 ### トピックブランチの維持

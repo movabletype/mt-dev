@@ -94,14 +94,14 @@ ifneq (${ARCHIVE},)
 	${MAKEFILE_DIR}/bin/extract-archive ${BASE_ARCHIVE_PATH} ${MT_HOME_PATH} $(shell echo ${ARCHIVE} | tr ',' ' ')
 endif
 
-	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --local-repo "$(shell echo ${LOCAL_REPO} | tr ',' ' ')"))
+	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --repo "$(shell echo ${REPO} | tr ',' ' ')"))
 ifneq (${RECIPE},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
-ifneq (${LOCAL_REPO},)
+ifneq (${REPO},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
-	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" LOCAL_REPO="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
+	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
 up-common-invoke-docker-compose: setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
