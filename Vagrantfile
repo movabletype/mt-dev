@@ -139,7 +139,7 @@ end
 vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.7.25"
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "bento/ubuntu-18.04"
   config.vm.network "private_network", ip: vm_private_network_ip
   config.vm.hostname = "mt-dev"
 
