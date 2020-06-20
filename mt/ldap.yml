@@ -1,4 +1,4 @@
 version: "3"
 services:
   ldap:
-    image: ${DOCKER_LDAP_IMAGE:-movabletype/dev:openldap}
+    image: ${DOCKER_LDAP_IMAGE:-movabletype/test:openldap}
