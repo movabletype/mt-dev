@@ -1,1 +1,0 @@
-FROM movabletype/test:openldap

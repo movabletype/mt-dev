@@ -1,7 +1,7 @@
 version: "3"
 services:
   mt:
-    image: ${DOCKER_MT_IMAGE:-movabletype/dev:perl-5.28}
+    image: ${DOCKER_MT_IMAGE:-movabletype/test:perl-5.28}
     restart: always
     working_dir: /var/www/cgi-bin/mt
     entrypoint: /usr/local/bin/docker-entrypoint.sh
@@ -14,7 +14,7 @@ services:
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
 
   httpd:
-    image: ${DOCKER_HTTPD_IMAGE:-movabletype/dev:php-7.3}
+    image: ${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     volumes:

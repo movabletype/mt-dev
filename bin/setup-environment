@@ -35,13 +35,13 @@ sub handle_recipe {
 
     # detect docker images
     if ( my $perl = delete $data->{perl} ) {
-        $env->{DOCKER_MT_IMAGE} = "movabletype/dev:perl-$perl";
+        $env->{DOCKER_MT_IMAGE} = "movabletype/test:perl-$perl";
     }
     if ( my $mysql = delete $data->{database} ) {
         $env->{DOCKER_MYSQL_IMAGE} = $mysql;
     }
     if ( my $php = delete $data->{php} ) {
-        $env->{DOCKER_HTTPD_IMAGE} = "movabletype/dev:php-$php";
+        $env->{DOCKER_HTTPD_IMAGE} = "movabletype/test:php-$php";
     }
 
     # checout branch and collect links

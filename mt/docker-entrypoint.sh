@@ -7,6 +7,14 @@ chmod 777 /var/www/cgi-bin/mt/theme
 if [ "$1" = "apache2-foreground" ]; then
     rm -f /var/log/apache2/access.log # disable access logging
 
+    httpd_conf_d=`test -e /etc/httpd/conf.d && echo /etc/httpd/conf.d || echo '/etc/apache2/conf-enabled'`
+    cat > $httpd_conf_d/mt.conf <<CONF
+Timeout 3600
+
+# mt-static
+Alias /mt-static/ /var/www/cgi-bin/mt/mt-static/
+CONF
+
     # invoke php-fpm
     if [ -e /usr/sbin/php-fpm ]; then
         mkdir /run/php-fpm

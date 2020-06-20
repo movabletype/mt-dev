@@ -13,10 +13,10 @@ BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
 
 # shortcuts.
 ifneq (${PHP},)
-DOCKER_HTTPD_IMAGE=movabletype/dev:php-${PHP}
+DOCKER_HTTPD_IMAGE=movabletype/test:php-${PHP}
 endif
 ifneq (${PERL},)
-DOCKER_MT_IMAGE=movabletype/dev:perl-${PERL}
+DOCKER_MT_IMAGE=movabletype/test:perl-${PERL}
 endif
 ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
@@ -132,7 +132,7 @@ clean-config:
 	rm ~/.mt-dev.conf
 
 clean-image: down
-	${DOCKER} images | grep movabletype/dev | awk '{ print $$3 }' | xargs ${DOCKER} rmi -f
+	${DOCKER} images | grep movabletype | awk '{ print $$3 }' | xargs ${DOCKER} rmi -f
 
 docker-compose:
 	${_DC} ${ARGS}
