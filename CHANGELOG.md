@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2020-06-22
+
+### Changed
+
+* Use movabletype/test instead of movabletype/dev for docker image.
+
 ### Removed
 
 * We don't need to build php-5.3 as it can be verified on CentoOS 6.
