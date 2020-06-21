@@ -66,7 +66,7 @@ gitのURLを直接指定することもできます。
 $ vagrant mt-dev up ARCHIVE=MT.tar.gz REPO=git@github.com:movabletype/mt-plugin-shared-preview.git
 ```
 
-REPOで指定してPSGI環境で起動した場合、プラグインのファイルをローカル環境で更新しても即座には反映されません。PSGIのプロセスを明示的に再起動する必要がありますg
+REPOで指定してPSGI環境で起動した場合、プラグインのファイルをローカル環境で更新しても即座には反映されません。PSGIのプロセスを明示的に再起動する必要があります。
 
 ### .env ファイルの利用
 
