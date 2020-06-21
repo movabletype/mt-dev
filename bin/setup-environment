@@ -114,13 +114,16 @@ YAML
 }
 
 for my $recipe ( split /\s+/, $recipes ) {
-    $recipe =~ s{\.yaml\z}{};
-    $recipe .= '.yaml';
-
-    my $recipe_file = "$recipe_dir/$recipe";
+    my $recipe_file = ( $recipe =~ m{^[/\.]} && -e $recipe )
+        ? realpath($recipe)
+        : do {
+            $recipe =~ s{\.yaml\z}{};
+            $recipe .= '.yaml';
+            "$recipe_dir/$recipe";
+        };
 
     # get recipe
-    if ( !-e $recipe_file || realpath($recipe_file) !~ m/^$recipe_dir/ ) {
+    if ( !-e $recipe_file ) {
         $recipe_file = "";
 
         my $recipe_url = $recipe =~ m{\Ahttps?://} ? $recipe : do {
@@ -168,23 +171,28 @@ for my $recipe ( split /\s+/, $recipes ) {
 }
 
 for my $r ( split /\s+/, $repos ) {
-    my $repo_dir = "$repo_dir/$r";
+    my $directory
+        = ( $r =~ m{^[/\.]} && -d $r )
+        ? realpath($r)
+        : "$repo_dir/$r";
+
+    next unless $directory;
 
     # get repo
-    if ( !-e $repo_dir || realpath($repo_dir) !~ m/^$repo_dir/ ) {
+    if ( !-d $directory ) {
         my $k = basename($r);
-        $repo_dir = catfile( $repo_base_dir, $k );
+        $directory = catfile( $repo_base_dir, $k );
 
-        my $cmd = "$git_clone_cmd $r $repo_dir";
+        my $cmd = "$git_clone_cmd $r $directory";
         my $res = `$cmd 2>&1` || "";
         die "$res\nGot an error: $cmd" if $?;
 
-        $res = `cd $repo_dir && git rev-parse HEAD 2>&1`;
+        $res = `cd $directory && git rev-parse HEAD 2>&1`;
         die "$res\nGot an error: git rev-parse HEAD" if $?;
         print STDERR "$k:$res";
     }
 
-    handle_recipe( { $r => { directory => $repo_dir, }, } );
+    handle_recipe( { $r => { directory => $directory, }, } );
 }
 
 if (@$yamls) {
