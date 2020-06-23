@@ -56,7 +56,7 @@ $ vagrant mt-dev up DB=mariadb:10.5.1-bionic   # MariaDB 10.5.1を利用する
 
 ### プラグインの参照
 
-repo以下にMovable Typeの一般的なディレクトリ構成のプラグインを置き、ディレクトリ名をREPOとして指定すると、そのプラグインがインストールされた状態で起動されます。
+repoディレクトリ以下にMovable Typeの一般的なディレクトリ構成のプラグインを置き、ディレクトリ名をREPOとして指定すると、そのプラグインがインストールされた状態で起動されます。
 
 ```
 $ git clone git@github.com:movabletype/mt-plugin-shared-preview.git repo/mt-plugin-shared-preview
