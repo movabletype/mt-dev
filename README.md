@@ -29,7 +29,8 @@ You can use both Vagrant and Docker environments. Vagrant is default environment
 ### Getting started
 
 ```
-$ vagrant mt-dev up ARCHIVE=MT.tar.gz
+$ cp /path/to/MT7-R0000.zip archive/
+$ vagrant mt-dev up ARCHIVE=MT7-R0000.zip
 $ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8mb4 */'
 ```
 
