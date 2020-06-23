@@ -29,6 +29,8 @@ VagrantとDockerの環境が利用できます。Vagrantの方を標準として
 ### 動かしてみる
 
 ```
+$ git clone git@github.com:movabletype/mt-dev.git mt-dev
+$ cd mt-dev
 $ cp /path/to/MT7-R0000.zip archive/
 $ vagrant mt-dev up ARCHIVE=MT7-R0000.zip
 $ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8mb4 */'
