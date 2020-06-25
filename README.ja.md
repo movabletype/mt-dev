@@ -2,7 +2,7 @@
 
 Movable Typeの開発環境です。
 
-VagrantとDockerの環境が利用できます。Vagrantの方を標準としてサポートおり、どのOS上でもMTの動作が高速で安定しています。Dockerを直接利用できる環境の場合にはVagrantを介すことなくDockerで起動でき、こちらの方が開発との相性はよいです。
+VagrantとDockerの環境が利用できます。Vagrantの方を標準としてサポートしており、どのOS上でもMTの動作が高速で安定しています。Dockerを直接利用できる環境の場合にはVagrantを介すことなくDockerで起動でき、こちらの方が開発との相性はよいです。
 
 ### 必要なもの
 
