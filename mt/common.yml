@@ -6,6 +6,7 @@ services:
     working_dir: /var/www/cgi-bin/mt
     entrypoint: /usr/local/bin/docker-entrypoint.sh
     volumes:
+      - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
       - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
       - "${BASE_SITE_PATH:-site}:/var/www/html"
@@ -18,6 +19,7 @@ services:
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     volumes:
+      - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
       - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
       - "${BASE_SITE_PATH:-site}:/var/www/html"
