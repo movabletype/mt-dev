@@ -28,8 +28,7 @@ CONF
     fi
 else
     if [ -e "/var/www/cgi-bin/mt/Makefile" ]; then
-        rm /var/www/cgi-bin/mt/build-language-stamp # remove cache file
-        make -C /var/www/cgi-bin/mt me
+        make -C /var/www/cgi-bin/mt clean me
     fi
 
     exec "$@"
