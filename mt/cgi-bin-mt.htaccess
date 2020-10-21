@@ -2,4 +2,4 @@ Options +SymLinksIfOwnerMatch
 
 RewriteEngine on
 RewriteRule ^mt-static - [L]
-RewriteRule (.*) http://mt:80/cgi-bin/mt/$1 [P,L]
+RewriteRule (.*) http://mt/cgi-bin/mt/$1 [P,L]
