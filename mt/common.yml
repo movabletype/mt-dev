@@ -5,6 +5,8 @@ services:
     restart: always
     working_dir: /var/www/cgi-bin/mt
     entrypoint: /usr/local/bin/docker-entrypoint.sh
+    environment:
+      NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
