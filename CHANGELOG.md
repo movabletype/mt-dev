@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Enable to specify branch by "#" in REPO
+    * e.g. REPO="https://github.com/user/mt-plugin-XXX.git#main"
+
 ## [1.0.3] - 2020-10-22
 
 ### Added

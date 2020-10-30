@@ -180,10 +180,13 @@ for my $r ( split /\s+/, $repos ) {
 
     # get repo
     if ( !-d $directory ) {
+        my $branch = '';
+        $branch = $1 if $r =~ s/(?:#(\w+))\z//;
+
         my $k = basename($r);
         $directory = catfile( $repo_base_dir, $k );
 
-        my $cmd = "$git_clone_cmd $r $directory";
+        my $cmd = "$git_clone_cmd $r $directory $branch";
         my $res = `$cmd 2>&1` || "";
         die "$res\nGot an error: $cmd" if $?;
 
