@@ -20,6 +20,7 @@ use File::Temp qw(tempfile tmpnam);
 GetOptions(
     'recipe=s' => \my $recipes,
     'repo=s'   => \my $repos,
+    'pr=s'     => \my $pull_reqs,
 );
 
 my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
@@ -61,8 +62,14 @@ sub handle_recipe {
         }
 
         if ($repo) {
-            my $cmd
-                = "$git_clone_cmd $repo $dest_dir @{[$data->{$k}{branch} || '']}";
+            my $branch = $data->{$k}{branch} || '';
+            for my $pr ( split /\s+/, $pull_reqs ) {
+                my ($pr_repo, $pr_id) = ($pr =~ m{([^/]+)/(pull/\d+)});
+                next unless $pr_repo && $pr_id;
+                $branch = $pr_id . '/head' if basename($dest_dir) eq $pr_repo;
+            }
+
+            my $cmd = "$git_clone_cmd $repo $dest_dir $branch";
             my $res = `$cmd 2>&1` || "";
             die "$res\nGot an error: $cmd" if $?;
 

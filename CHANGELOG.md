@@ -6,10 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2021-01-13
+
 ### Added
 
 * Enable to specify branch by "#" in REPO
     * e.g. REPO="https://github.com/user/mt-plugin-XXX.git#main"
+* Enable to specify branch by PR parameter
+    * e.g. PR="https://github.com/movabletype/movabletype/pull/1527"
 
 ## [1.0.3] - 2020-10-22
 

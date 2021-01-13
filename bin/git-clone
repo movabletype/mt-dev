@@ -16,7 +16,12 @@ git fetch --tags --prune
 if [ "$UPDATE_BRANCH" = "yes" -o "$UPDATE_BRANCH" = "1" ] && [ -n "$branch" ]; then
     git checkout .
     git clean -f
+
+    if [[ $branch == pull/* ]]; then
+        git fetch origin refs/$branch:refs/remotes/origin/$branch
+    fi
     git checkout $branch
+
     if git symbolic-ref --short HEAD 2>/dev/null; then
       git rebase $(git rev-parse --abbrev-ref --symbolic-full-name @{u})
     fi
