@@ -70,7 +70,7 @@ PassEnv NLS_LANG
 CONF
     fi
 
-    if [ -e "/var/www/cgi-bin/mt/Makefile" ]; then
+    if [ "$MT_DEV_UPDATE_BRANCH" = "yes" -o "$MT_DEV_UPDATE_BRANCH" = "1" ] && [ -e "/var/www/cgi-bin/mt/Makefile" ]; then
         make -C /var/www/cgi-bin/mt clean me
     fi
 

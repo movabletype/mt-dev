@@ -7,6 +7,7 @@ services:
     entrypoint: /usr/local/bin/docker-entrypoint.sh
     environment:
       NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
+      MT_DEV_UPDATE_BRANCH: ${UPDATE_BRANCH:-yes}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
