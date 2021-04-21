@@ -3,7 +3,6 @@
 reload_options="`ls *.cgi | sed -e 's/^/-R /'` `ls mt-static | grep -v support | sed -e 's/^/-R mt-static\//'`"
 
 exec starman \
-    -E production \
     -MCGI \
     -MFile::Spec \
     -MCGI::Cookie \
@@ -13,7 +12,6 @@ exec starman \
     -MDBI \
     -MDBD::mysql \
     -MImage::Magick \
-    -L Shotgun \
     -R addons \
     -R alt-tmpl \
     -R default_templates \
@@ -26,7 +24,4 @@ exec starman \
     -R tmpl \
     -R tools \
     $reload_options \
-    --port=80 \
-    --workers=2 \
-    --pid=/tmp/mt.psgi.pid \
     "$@"
