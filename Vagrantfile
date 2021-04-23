@@ -153,6 +153,7 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent = true
 
   config.vm.provision "shell", inline: <<-SHELL
+    export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y make git zip \
       docker.io \

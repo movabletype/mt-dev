@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Also prevent running `make clean me` when `UPDATE_BRANCH=no` is specified.
+* Invoke `apt` with DEBIAN_FRONTEND=noninteractive in provisioning.
 
 ## [1.0.4] - 2021-01-13
 
