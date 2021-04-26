@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Also link automatically "tools/*" of each plugins.
+
 ### Fixed
 
 * Also prevent running `make clean me` when `UPDATE_BRANCH=no` is specified.

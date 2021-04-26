@@ -95,6 +95,7 @@ sub handle_recipe {
                     glob("$plugin_dir/themes/*"),
                     glob("$plugin_dir/addons/*"),
                     glob("$plugin_dir/mt-static/addons/*"),
+                    glob("$plugin_dir/tools/*"),
                 )
             ];
         }
