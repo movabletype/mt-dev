@@ -48,6 +48,10 @@ ifneq (${WITHOUT_MT_CONFIG_CGI},)
 export MT_CONFIG_CGI_DEST_PATH=/tmp/mt-config.cgi
 endif
 
+ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
+$(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
+endif
+
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
 
 
