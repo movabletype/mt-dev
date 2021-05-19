@@ -63,10 +63,25 @@ sub handle_recipe {
 
         if ($repo) {
             my $branch = $data->{$k}{branch} || '';
+
             for my $pr ( split /\s+/, $pull_reqs ) {
                 my ($pr_repo, $pr_id) = ($pr =~ m{([^/]+)/(pull/\d+)});
                 next unless $pr_repo && $pr_id;
                 $branch = $pr_id . '/head' if basename($dest_dir) eq $pr_repo;
+            }
+
+            {
+                my %repos = map { $_ => 1 } split /\s+/, $repos;
+                for my $r ( keys %repos ) {
+                    my ($bn, $br) = $r =~ m{([^/]+)#(.*)$}
+                        or next;
+
+                    next unless basename($dest_dir) eq $bn;
+
+                    $branch = $br;
+                    delete $repos{$r};
+                }
+                $repos = join ' ', keys %repos;
             }
 
             my $cmd = "$git_clone_cmd $repo $dest_dir $branch";

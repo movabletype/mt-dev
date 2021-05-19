@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Also link automatically "tools/*" of each plugins.
+* Enable to override branch by REPO
+    * e.g. REPO="git@github.com:movabletype/movabletype#topic-branch"
 
 ### Fixed
 
