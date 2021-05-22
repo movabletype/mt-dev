@@ -5,7 +5,7 @@ file=$2
 
 cd `mktemp -d`
 
-unzip -q $file || tar zxf $file
+( unzip -q $file || tar zxf $file ) 2>&1 | grep -v 'unzip: short read'
 
 if [ `ls | wc -l` -eq "1" ] && ls | egrep -v '^(addons|mt-static|php|alt-tmpl|plugins|default_templates|search_templates|extlib|themes|import|tmpl|tools|lib|.*\.cgi)$' >/dev/null 2>&1; then
     cd `ls`

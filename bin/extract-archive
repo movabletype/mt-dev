@@ -13,12 +13,13 @@ dest=$1; shift
 
 script=extract-archive-on-docker
 
+tmpdir=/tmp/mt-dev-extract-archive-$$
+mkdir $tmpdir
 for f in "$@"; do
     if echo "$f" | egrep -q "^https?://"; then
         name=$(basename $f)
-        mkdir /tmp/$$
-        path=/tmp/$$/$name
-        curl -L -o $path $f
+        path=$tmpdir/$name
+        curl -s -L -o $path $f
     else
         name=$f
         path=$base/$f
@@ -26,5 +27,6 @@ for f in "$@"; do
     $md5 $path
     docker run --rm -v $dest:/dest -v $path:/archive/$name -v $script_dir/$script:/usr/local/bin/$script -w /dest busybox:uclibc /usr/local/bin/$script /dest /archive/$name
 done
+rm -fr $tmpdir
 
 docker run --rm -v $dest:/dest busybox:uclibc ls /dest/mt.cgi > /dev/null
