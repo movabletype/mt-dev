@@ -7,25 +7,29 @@ use utf8;
 use FindBin;
 use lib "$FindBin::Bin/local/lib/perl5";
 
-use Cwd qw(realpath);
+use Cwd qw(realpath getcwd);
+use IO::File;
 use Data::Dumper;
+use Digest::MD5;
 use Getopt::Long;
 use HTTP::Tiny;
 use Config::Tiny;
 use YAML::Tiny qw(LoadFile DumpFile);
-use File::Basename qw(basename);
+use File::Basename qw(basename fileparse);
 use File::Spec::Functions qw(catfile);
-use File::Temp qw(tempfile tmpnam);
+use File::Temp qw(tempfile tmpnam tempdir);
 
 GetOptions(
-    'recipe=s' => \my $recipes,
-    'repo=s'   => \my $repos,
-    'pr=s'     => \my $pull_reqs,
+    'recipe=s'  => \my $recipes,
+    'repo=s'    => \my $repos,
+    'pr=s'      => \my $pull_reqs,
+    'archive=s' => \my $archives,
 );
 
 my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_dir      = realpath("$FindBin::Bin/../repo");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
+my $archive_dir      = realpath("$FindBin::Bin/../archive");
 my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
 my $env   = {};
@@ -219,6 +223,58 @@ for my $r ( split /\s+/, $repos ) {
     }
 
     handle_recipe( { $r => { directory => $directory, }, } );
+}
+
+for my $a ( split /\s+/, $archives ) {
+    my $file_path;
+    my ( $basename, $ext ) = ( fileparse( $a, qr/\.[a-zA-Z\.]+$/ ) )[ 0, 2 ];
+
+    if ( $a =~ m{^https?://} ) {
+
+        # download
+        my $response = HTTP::Tiny->new->get($a);
+        die "Failed: @{[Dumper($response)]}"
+            unless $response->{success} && length $response->{content};
+
+        ( my $fh, $file_path ) = tempfile( undef, SUFFIX => $ext );
+        print $fh $response->{content};
+    }
+    elsif ( $a =~ m{^/} ) {
+        $file_path = $a;
+    }
+    else {
+        $file_path = catfile( $archive_dir, $a );
+    }
+
+    die "File not found: $a" unless -f $file_path;
+
+    # extract archive
+    my $cwd       = getcwd();
+    my $directory = tempdir( '/tmp/mt-dev-archive-temp-XXXXX', );
+
+    chdir $directory;
+    my $extract_res
+        = $file_path =~ m/\.zip$/i
+        ? `unzip -q $file_path`
+        : `tar zxf $file_path`;
+    if ($?) {
+        die "Failed to extract: $a";
+    }
+
+    my $md5_ctx = Digest::MD5->new;
+    $md5_ctx->addfile( IO::File->new( $file_path, 'r' ) );
+    print STDERR join( ':', $basename . $ext, $md5_ctx->hexdigest ) . "\n";
+
+    my @entries = grep {
+        !m{^(addons|mt-static|php|alt-tmpl|plugins|default_templates|search_templates|extlib|themes|import|tmpl|tools|lib|.*\.cgi)$}
+    } glob('*');
+    if ( @entries == 1 ) {
+        $directory = catfile( $directory, $entries[0] );
+    }
+    chdir $cwd;
+
+    $basename =~ s{\.}{_}g;    # "." causes problems in yaml files
+    handle_recipe( { $basename => { directory => $directory, }, } );
 }
 
 if (@$yamls) {

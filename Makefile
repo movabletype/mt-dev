@@ -90,17 +90,26 @@ up-cgi: up-common
 up-psgi: MT_RUN_VIA=psgi
 up-psgi: up-common
 
+
+ifeq (${RECIPE},)
+ARCHIVE_FOR_SETUP=""
+else
+ARCHIVE_FOR_SETUP=${ARCHIVE}
+endif
+
 up-common: down fixup
 	${MAKE} down-mt-home-volume
 	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 
 ifneq (${ARCHIVE},)
+ifeq (${RECIPE},)
 	# TBD: random name?
 	$(eval MT_HOME_PATH=mt-dev-mt-home-tmp)
 	${MAKEFILE_DIR}/bin/extract-archive ${BASE_ARCHIVE_PATH} ${MT_HOME_PATH} $(shell echo ${ARCHIVE} | tr ',' ' ')
 endif
+endif
 
-	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --repo "$(shell echo ${REPO} | tr ',' ' ')" --pr "$(shell echo ${PR} | tr ',' ' ')"))
+	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --repo "$(shell echo ${REPO} | tr ',' ' ')" --pr "$(shell echo ${PR} | tr ',' ' ')" --archive "$(shell echo ${ARCHIVE_FOR_SETUP} | tr ',' ' ')"))
 ifneq (${RECIPE},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
@@ -128,6 +137,7 @@ endif
 
 down:
 	${_DC} down --remove-orphans ${DOWN_ARGS}
+	${MAKEFILE_DIR}/bin/teardown-environment
 	${MAKE} down-mt-home-volume
 
 down-mt-home-volume:
