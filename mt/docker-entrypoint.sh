@@ -14,6 +14,17 @@ Timeout 3600
 # mt-static
 Alias /mt-static/ /var/www/cgi-bin/mt/mt-static/
 CONF
+    for d in /var/www/html/cgi-bin/mt /var/www/cgi-bin/mt; do
+        cat >> $httpd_conf_d/mt.conf <<CONF
+<Directory "$d">
+  Options +SymLinksIfOwnerMatch
+
+  RewriteEngine on
+  RewriteRule ^mt-static - [L]
+  RewriteRule (.*) http://mt/cgi-bin/mt/\$1 [P,L]
+</Directory>
+CONF
+    done
 
     mod_rewrite_so=`find /usr/lib/apache2/modules /usr/lib64/httpd/modules /usr/lib/httpd/modules -name 'mod_rewrite.so' 2>/dev/null | head -1`
     if [ -n "$mod_rewrite_so" ]; then

@@ -29,9 +29,6 @@ services:
       - "support:/var/www/cgi-bin/mt/mt-static/support"
       # override entrypoint
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
-      # proxy setting
-      - "./cgi-bin-mt.htaccess:/var/www/html/cgi-bin/mt/.htaccess"
-      - "./cgi-bin-mt.htaccess:/var/www/cgi-bin/mt/.htaccess"
     ports:
       - "${HTTPD_EXPOSE_PORT:-80}:80"
     command: apache2-foreground
