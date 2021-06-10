@@ -124,6 +124,8 @@ sub handle_recipe {
         }
     }
 
+    return unless @volumes;
+
     my ( $fh, $file ) = tmpnam();
     print $fh <<YAML;
 version: "3"
