@@ -35,6 +35,10 @@ my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 my $env   = {};
 my $yamls = [];
 
+sub is_file {
+    $_[0] =~ m/\.(cgi|pl)$/;
+}
+
 sub handle_recipe {
     my $data = shift;
 
@@ -107,20 +111,27 @@ sub handle_recipe {
         my $links = $data->{$k}{links};
         if ( !$links ) {
             $links = [
-                map { $_ =~ s{\A$plugin_dir/}{}; $_ } (
-                    glob("$plugin_dir/*.cgi"),
-                    glob("$plugin_dir/plugins/*"),
-                    glob("$plugin_dir/mt-static/plugins/*"),
-                    glob("$plugin_dir/themes/*"),
-                    glob("$plugin_dir/addons/*"),
-                    glob("$plugin_dir/mt-static/addons/*"),
-                    glob("$plugin_dir/tools/*"),
-                )
+                map { $_ =~ s{\A$plugin_dir/}{}; $_ }
+                grep { -d $_ || is_file($_) } # skip unsupported files
+                    (
+                        glob("$plugin_dir/*.cgi"),
+                        glob("$plugin_dir/plugins/*"),
+                        glob("$plugin_dir/mt-static/plugins/*"),
+                        glob("$plugin_dir/themes/*"),
+                        glob("$plugin_dir/addons/*"),
+                        glob("$plugin_dir/mt-static/addons/*"),
+                        glob("$plugin_dir/tools/*"),
+                    )
             ];
         }
 
         for my $l (@$links) {
-            push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l'";
+            if (is_file($l)) {
+                push @volumes, "      - '$plugin_dir/$l:/usr/local/lib/mt/$l'";
+            }
+            else {
+                push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l'";
+            }
         }
     }
 

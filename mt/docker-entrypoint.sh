@@ -71,6 +71,21 @@ else
     httpd_conf_d=`ls -d /etc/httpd/conf.d /etc/apache2/conf-enabled /etc/httpd/conf/extra 2>/dev/null | head -1`
     cat > $httpd_conf_d/mt.conf <<CONF
 Timeout 3600
+
+ScriptAlias /cgi-bin-mt/ /usr/local/lib/mt/
+<Directory "/usr/local/lib/mt/">
+  AllowOverride All
+  Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+  Require all granted
+  SetEnv MT_HOME /var/www/cgi-bin/mt
+</Directory>
+
+<Directory "/var/www/cgi-bin/mt">
+  RewriteEngine on
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule (.*.cgi)$ /cgi-bin-mt/\$1 [L]
+</Directory>
 CONF
 
     mod_env_so=`find /usr/lib/apache2/modules /usr/lib64/httpd/modules /usr/lib/httpd/modules -name 'mod_env.so' 2>/dev/null | head -1`
