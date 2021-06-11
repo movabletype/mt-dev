@@ -61,7 +61,7 @@ up: up-cgi
 
 fixup:
 	@perl -e 'exit($$ENV{MT_HOME_PATH} =~ m{/})' || \
-		for f in mt-config.cgi mt-tb.cgi mt-comment.cgi; do \
+		for f in mt-config.cgi mt-tb.cgi mt-comment.cgi .htaccess; do \
 			fp=${MT_HOME_PATH}/$$f; \
 			[ -d $$fp ] && rmdir $$fp || true; \
 			[ -f $$fp ] && perl -e 'exit((stat(shift))[7] == 0 ? 0 : 1)' $$fp && rm -f $$fp || true; \
