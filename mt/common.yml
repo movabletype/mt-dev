@@ -8,10 +8,11 @@ services:
     environment:
       NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
       MT_DEV_UPDATE_BRANCH: ${UPDATE_BRANCH:-yes}
+      MT_CONFIG: ${MT_CONFIG_CGI_DEST_PATH:-/usr/local/lib/mt/mt-config.cgi}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
-      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/usr/local/lib/mt/mt-config.cgi}"
       - "${BASE_SITE_PATH:-site}:/var/www/html"
       - "support:/var/www/cgi-bin/mt/mt-static/support"
       # override entrypoint
@@ -21,10 +22,12 @@ services:
     image: ${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
+    environment:
+      MT_CONFIG: ${MT_CONFIG_CGI_DEST_PATH:-/usr/local/lib/mt/mt-config.cgi}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
-      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/usr/local/lib/mt/mt-config.cgi}"
       - "${BASE_SITE_PATH:-site}:/var/www/html"
       - "support:/var/www/cgi-bin/mt/mt-static/support"
       # override entrypoint

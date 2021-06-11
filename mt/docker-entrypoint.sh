@@ -93,6 +93,7 @@ CONF
         cat > $httpd_conf_d/mt-env.conf <<CONF
 LoadModule env_module $mod_env_so
 PassEnv NLS_LANG
+PassEnv MT_CONFIG
 CONF
     fi
 
