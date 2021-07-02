@@ -38,6 +38,19 @@ ProxyPassReverse / http://mt/
 CONF
     fi
 
+    mod_include_so=`find /usr/lib/apache2/modules /usr/lib64/httpd/modules /usr/lib/httpd/modules -name 'mod_include.so' 2>/dev/null | head -1`
+    if [ -n "$mod_include_so" ]; then
+        cat > $httpd_conf_d/mt-include.conf <<CONF
+LoadModule include_module /usr/lib/apache2/modules/mod_include.so
+<Directory /var/www/html>
+<IfModule mod_include.c>
+Options +Includes
+AddOutputFilter INCLUDES .html
+</IfModule>
+</Directory>
+CONF
+    fi
+
     if [ $httpd_conf_d = "/etc/httpd/conf/extra" ]; then
         # archlinux
         cat >> /etc/httpd/conf/httpd.conf <<CONF
