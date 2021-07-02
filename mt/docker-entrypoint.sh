@@ -17,6 +17,17 @@ Timeout 3600
 # mt-static
 Alias /mt-static/ /var/www/cgi-bin/mt/mt-static/
 CONF
+    for d in /var/www/html/cgi-bin/mt /var/www/cgi-bin/mt; do
+        cat >> $httpd_conf_d/mt.conf <<CONF
+<Directory "$d">
+  Options +SymLinksIfOwnerMatch
+
+  RewriteEngine on
+  RewriteRule ^mt-static - [L]
+  RewriteRule (.*) http://mt/cgi-bin/mt/\$1 [P,L]
+</Directory>
+CONF
+    done
 
     mod_rewrite_so=`find $module_dirs -name 'mod_rewrite.so' 2>/dev/null | head -1`
     if [ -n "$mod_rewrite_so" ]; then
@@ -76,6 +87,21 @@ else
     httpd_conf_d=`ls -d $conf_dirs 2>/dev/null | head -1`
     cat > $httpd_conf_d/mt.conf <<CONF
 Timeout 3600
+
+ScriptAlias /cgi-bin-mt/ /usr/local/lib/mt/
+<Directory "/usr/local/lib/mt/">
+  AllowOverride All
+  Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+  Require all granted
+  SetEnv MT_HOME /var/www/cgi-bin/mt
+</Directory>
+
+<Directory "/var/www/cgi-bin/mt">
+  RewriteEngine on
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule (.*.cgi)$ /cgi-bin-mt/\$1 [L]
+</Directory>
 CONF
 
     mod_env_so=`find $module_dirs -name 'mod_env.so' 2>/dev/null | head -1`
@@ -83,6 +109,7 @@ CONF
         cat > $httpd_conf_d/mt-env.conf <<CONF
 LoadModule env_module $mod_env_so
 PassEnv NLS_LANG
+PassEnv MT_CONFIG
 CONF
     fi
 
