@@ -2,6 +2,17 @@ version: "3"
 services:
   mt:
     restart: always
-    command: "${PLACKUP:-/usr/local/lib/mt/bin/plackup-mt -E production -L Shotgun --port=80 --workers=2 --pid=/tmp/mt.psgi.pid} /var/www/cgi-bin/mt/mt.psgi"
+    command: "${PLACKUP:-/usr/local/lib/mt/bin/plackup-mt} /var/www/cgi-bin/mt/mt.psgi"
+    environment:
+      MT_PID_FILE_PATH: ${MT_PID_FILE_PATH:-/tmp/mt.psgi.pid}
     volumes:
       - "./plackup-mt:/usr/local/lib/mt/bin/plackup-mt"
+  mt-watcher:
+    build:
+      context: mt-watcher
+    working_dir: /var/www/cgi-bin/mt
+    command: /usr/local/lib/mt/bin/mt-watcher.pl
+    volumes:
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
+      - "./mt-watcher.pl:/usr/local/lib/mt/bin/mt-watcher.pl"
+      - /var/run/docker.sock:/var/run/docker.sock
