@@ -31,6 +31,7 @@ export DOCKER_FTPD_IMAGE
 export MT_RUN_VIA
 export HTTPD_EXPOSE_PORT
 export PLACKUP
+export ENABLE_MT_WATCHER
 export CMD
 
 
