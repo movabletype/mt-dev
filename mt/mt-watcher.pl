@@ -5,6 +5,11 @@ use warnings;
 
 use Filesys::Notify::Simple;
 
+if ( $ENV{DISABLE_MT_WATCHER} ) {
+    warn('mt-watcher container is disbled.');
+    exit;
+}
+
 # wait for `make me` to complete
 sleep(5);
 

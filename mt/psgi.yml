@@ -12,6 +12,8 @@ services:
       context: mt-watcher
     working_dir: /var/www/cgi-bin/mt
     command: /usr/local/lib/mt/bin/mt-watcher.pl
+    environment:
+      DISABLE_MT_WATCHER: ${DISABLE_MT_WATCHER:-0}
     volumes:
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
       - "./mt-watcher.pl:/usr/local/lib/mt/bin/mt-watcher.pl"
