@@ -1,27 +1,31 @@
-#!/bin/bash
+#!/usr/bin/perl
 
-reload_options="`ls *.cgi | sed -e 's/^/-R /'` `ls mt-static | grep -v support | sed -e 's/^/-R mt-static\//'`"
+use strict;
+use warnings;
 
-exec starman \
-    -MCGI \
-    -MFile::Spec \
-    -MCGI::Cookie \
-    -MLWP::UserAgent \
-    -MHTML::Entities \
-    -MScalar::Util \
-    -MDBI \
-    -MDBD::mysql \
-    -MImage::Magick \
-    -R addons \
-    -R alt-tmpl \
-    -R default_templates \
-    -R extlib \
-    -R lib \
-    -R php \
-    -R plugins \
-    -R search_templates \
-    -R themes \
-    -R tmpl \
-    -R tools \
-    $reload_options \
-    "$@"
+use FindBin;
+
+my $server = 'starman';
+my @opts   = ();
+
+# Preload
+push @opts, map {"-M$_"} qw(
+    CGI
+    File::Spec
+    CGI::Cookie
+    LWP::UserAgent
+    HTML::Entities
+    Scalar::Util
+    DBI
+    DBD::mysql
+    Image::Magick
+);
+
+if ( $FindBin::Script eq 'plackup-mt-R' ) {
+
+    # -R options
+    push @opts, map { ( '-R' => $_ ) }
+        ( glob('*.cgi'), grep { $_ ne 'support' } glob('mt-static/*') );
+}
+
+exec $server, @opts, @ARGV;
