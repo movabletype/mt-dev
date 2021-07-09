@@ -1,7 +1,5 @@
 #!/bin/bash
 
-reload_options="`ls *.cgi | sed -e 's/^/-R /'` `ls mt-static | grep -v support | sed -e 's/^/-R mt-static\//'`"
-
 exec starman \
     -MCGI \
     -MFile::Spec \
@@ -12,16 +10,8 @@ exec starman \
     -MDBI \
     -MDBD::mysql \
     -MImage::Magick \
-    -R addons \
-    -R alt-tmpl \
-    -R default_templates \
-    -R extlib \
-    -R lib \
-    -R php \
-    -R plugins \
-    -R search_templates \
-    -R themes \
-    -R tmpl \
-    -R tools \
-    $reload_options \
+    -E production \
+    --port=80 \
+    --workers=2 \
+    --pid=$MT_PID_FILE_PATH \
     "$@"

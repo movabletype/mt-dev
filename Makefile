@@ -33,6 +33,9 @@ export HTTPD_EXPOSE_PORT
 export PLACKUP
 export CMD
 
+# mt-watcher container
+export PERL_FNS_NO_OPT
+
 
 # override variables
 ENV_FILE=.env
