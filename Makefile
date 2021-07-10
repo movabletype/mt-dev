@@ -34,6 +34,7 @@ export PLACKUP
 export CMD
 
 # mt-watcher container
+export DISABLE_MT_WATCHER
 export PERL_FNS_NO_OPT
 
 
