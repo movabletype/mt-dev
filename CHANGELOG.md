@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+#### Removed some options for starman
+
+* Stop passing the -R option
+    * https://metacpan.org/dist/Starman/view/script/starman#RELOADING-THE-APPLICATION
+* Stop passing the "-L Shotgun", because it is different from the option in general production environment.
+
+#### New file monitoring container
+
+* Added a container to monitor file updates and send a HUP signal to starman.
+
+[Details](https://github.com/movabletype/mt-dev/wiki/Architecture#mt-watcher)
+
+
 ## [1.0.7] - 2021-07-02
 
 ### Added
