@@ -36,6 +36,9 @@ services:
       - "${HTTPD_EXPOSE_PORT:-80}:80"
     command: apache2-foreground
 
+  mt-watcher:
+    image: busybox
+
 volumes:
   site:
     driver: local

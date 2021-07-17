@@ -10,6 +10,7 @@ services:
   mt-watcher:
     build:
       context: mt-watcher
+    image: movabletype/mt-watcher
     working_dir: /var/www/cgi-bin/mt
     command: /usr/local/lib/mt/bin/mt-watcher.pl
     environment:

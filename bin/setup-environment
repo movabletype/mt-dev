@@ -136,6 +136,9 @@ services:
   httpd:
     volumes:
 @{[join "\n", @volumes]}
+  mt-watcher:
+    volumes:
+@{[join "\n", @volumes]}
 YAML
     close $fh;
 
