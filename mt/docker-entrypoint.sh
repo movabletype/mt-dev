@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ -n "$DOCKER_MT_SERVICES"  ]; then
+    for s in $DOCKER_MT_SERVICES; do
+        service $s start
+    done
+fi
+
 chmod 777 /var/www/html
 chmod 777 /var/www/cgi-bin/mt/mt-static/support
 chmod 777 /var/www/cgi-bin/mt/themes

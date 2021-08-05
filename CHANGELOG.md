@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Enable to start service via.
+    * e.g. DOCKER\_MT\_SERVICES=postfix
+
 ### Fixed
 
 * Also watch the plugin directory specified by REPO.
