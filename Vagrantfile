@@ -136,7 +136,7 @@ class MtDev < Vagrant.plugin("2")
   end
 end
 
-vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.7.25"
+vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
 
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-20.04"
