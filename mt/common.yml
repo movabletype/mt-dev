@@ -38,7 +38,16 @@ services:
     command: apache2-foreground
 
   mt-watcher:
-    image: busybox
+    build:
+      context: mt-watcher
+    working_dir: /var/www/cgi-bin/mt
+    environment:
+      PERL_FNS_NO_OPT: ${PERL_FNS_NO_OPT:-0}
+      DISABLE_MT_WATCHER: ${DISABLE_MT_WATCHER:-0}
+    volumes:
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt"
+      - "./mt-watcher.pl:/usr/local/lib/mt/bin/mt-watcher.pl"
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   site:
