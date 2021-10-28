@@ -17,6 +17,8 @@ services:
       - "support:/var/www/cgi-bin/mt/mt-static/support"
       # override entrypoint
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
+    labels:
+      mt-dev.service: "mt"
 
   httpd:
     image: ${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
