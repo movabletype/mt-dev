@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Enable to start service via.
     * e.g. DOCKER\_MT\_SERVICES=postfix
+* Support docker-compose 2.x
 
 ### Fixed
 
