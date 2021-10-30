@@ -3,3 +3,6 @@ services:
   mt:
     restart: always
     command: "/usr/sbin/httpd -D FOREGROUND"
+
+  mt-watcher:
+    command: "/bin/true"
