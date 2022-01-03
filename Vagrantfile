@@ -42,7 +42,7 @@ class MtDevCommand < Vagrant.plugin(2, :command)
         status = env[:ssh_run_exit_status] || 0
 
         if status != 0
-          puts <<MSG
+          puts <<~MSG
 Please execute this command first for copy your private key for github.
 
 $ vagrant mt-dev copy-ssh-key ~/.ssh/id_rsa
@@ -51,7 +51,7 @@ $ vagrant mt-dev copy-ssh-key ~/.ssh/id_rsa
 
 See also:
 https://github.com/movabletype/mt-dev/wiki/Troubleshooting
-MSG
+          MSG
           return 1
         end
       end
