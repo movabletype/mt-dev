@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2022-01-03
+
+### Changed
+
+* Change default private network.
+
 ### Added
 
 * Enable to start service via.
