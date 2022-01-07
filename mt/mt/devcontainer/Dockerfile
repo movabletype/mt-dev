@@ -23,4 +23,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 RUN cpm install -g \
     PLS Perl::LanguageServer
 
+COPY bin/* /usr/local/bin/
+
 USER vscode
