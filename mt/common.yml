@@ -1,7 +1,10 @@
 version: "3"
 services:
   mt:
-    image: ${DOCKER_MT_IMAGE:-movabletype/test:perl-5.28}
+    build:
+      context: ${DOCKER_MT_BUILD_CONTEXT:-mt/default}
+      args:
+        - DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE:-movabletype/test:perl-5.28}
     restart: always
     working_dir: /var/www/cgi-bin/mt
     entrypoint: /usr/local/bin/docker-entrypoint.sh

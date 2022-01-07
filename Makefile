@@ -22,6 +22,7 @@ ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
 endif
 
+export DOCKER_MT_BUILD_CONTEXT
 export DOCKER_MT_IMAGE
 export DOCKER_MT_SERVICES
 export DOCKER_HTTPD_IMAGE
@@ -134,6 +135,7 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} pull
+	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} build
 	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
 
 
