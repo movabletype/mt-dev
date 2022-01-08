@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Enable to invoke arbitrary command via mt-watcher.
+
+```
+$ make up-psgi ... # enabled only in PSGI mode
+$ make mt-watcher CMD="env MT_TEST_DSN='dbi:mysql:host=db;user=root;password=password' TEST_VERBOSE=1 prove -j4 -It/lib t/model/23-entry.t"
+# Run tests every time the file is saved.
+```
+
 ## [1.1.1] - 2022-01-03
 
 ### Changed

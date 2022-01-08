@@ -174,6 +174,9 @@ mt-shell:
 	${_DC} exec -e CMD mt /bin/bash -c "$$CMD"
 endif
 
+mt-watcher:
+	${_DC} exec -e CMD mt-watcher /usr/local/lib/mt/bin/mt-watcher.pl /bin/bash -c "$$CMD"
+
 cpan-install:
 	${_DC} exec mt cpm install -g ${ARGS}
 	${_DC} exec mt kill 1

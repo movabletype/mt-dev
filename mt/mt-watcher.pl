@@ -12,13 +12,20 @@ if ( $ENV{DISABLE_MT_WATCHER} ) {
 }
 
 # wait for `make me` to complete
-sleep(5);
+sleep(5) unless @ARGV;
 
 my $mt_home = $ENV{MT_HOME} || getcwd();
 $mt_home =~ s{/+$}{};    # remove trailing slash
 
-my @files   = ( map( {"$mt_home/$_"} qw(addons extlib lib plugins) ), glob("$mt_home/*.cgi") );
+my @files = (
+    map( { "$mt_home/$_" } qw(addons extlib lib plugins) ),
+    glob("$mt_home/*.cgi")
+);
 my $watcher = Filesys::Notify::Simple->new( \@files );
+
+my $mt_container_id = `docker ps -q --filter label=mt-dev.service=mt`;
+chomp($mt_container_id);
+
 while (1) {
     $watcher->wait(
         sub {
@@ -30,9 +37,14 @@ while (1) {
 
             return unless @paths;
 
-            print( join( "\n", @paths ) . "\n" );
-            my $mt_container_id = `docker ps -q --filter label=mt-dev.service=mt`;
-            system("docker kill -s HUP $mt_container_id");
+            if (@ARGV) {
+                print( join( ' ', @ARGV ) . "\n" );
+                system( qw(docker exec -t), $mt_container_id, @ARGV );
+            }
+            else {
+                print( join( "\n", @paths ) . "\n" );
+                system( qw(docker kill -s HUP), $mt_container_id );
+            }
 
             # throttling
             sleep(1);
