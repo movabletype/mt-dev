@@ -9,12 +9,13 @@ use lib "$FindBin::Bin/local/lib/perl5";
 
 use Cwd qw(realpath getcwd);
 use IO::File;
+use JSON::PP qw(encode_json);
 use Data::Dumper;
 use Digest::MD5;
 use Getopt::Long;
 use HTTP::Tiny;
 use Config::Tiny;
-use YAML::Tiny qw(LoadFile DumpFile);
+use YAML::Tiny qw(LoadFile Dump);
 use File::Basename qw(basename fileparse);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempfile tmpnam tempdir);
@@ -29,11 +30,15 @@ GetOptions(
 my $recipe_dir    = realpath("$FindBin::Bin/../recipe");
 my $repo_dir      = realpath("$FindBin::Bin/../repo");
 my $repo_base_dir = realpath("$FindBin::Bin/../..");
-my $archive_dir      = realpath("$FindBin::Bin/../archive");
+my $archive_dir   = realpath("$FindBin::Bin/../archive");
 my $git_clone_cmd = realpath("$FindBin::Bin/git-clone");
 
-my $env   = {};
-my $yamls = [];
+my $env       = {};
+my $yamls     = [];
+my $workspace = {
+    folders  => [],
+    settings => {},
+};
 
 sub handle_recipe {
     my $data = shift;
@@ -98,6 +103,7 @@ sub handle_recipe {
         }
 
         push @volumes, "      - '$dest_dir:/src/$basename:\${DOCKER_VOLUME_MOUNT_FLAG:-rw}'";
+        push @{ $workspace->{folders} }, { path => $basename, };
 
         next if $k eq 'core';
 
@@ -283,6 +289,20 @@ for my $a ( split /\s+/, $archives ) {
 
     $basename =~ s{\.}{_}g;    # "." causes problems in yaml files
     handle_recipe( { $basename => { directory => $directory, }, } );
+}
+
+{
+    my ( $ws_fh, $ws_file ) = tmpnam();
+    print $ws_fh encode_json($workspace);
+    close $ws_fh;
+
+    my ( $fh, $file ) = tmpnam();
+    print $fh Dump(
+        {   version  => "3",
+            services => { mt => { volumes => [ "$ws_file:/src/mt.code-workspace", ], }, },
+        }
+    );
+    push @$yamls, $file;
 }
 
 if (@$yamls) {
