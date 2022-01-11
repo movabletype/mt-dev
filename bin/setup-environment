@@ -54,12 +54,12 @@ sub handle_recipe {
     for my $k ( keys %$data ) {
         my $repo     = $data->{$k}{location};
         my $dest_dir = $data->{$k}{directory} || do {
-            ( my $dir = $repo ) =~ s{.*/}{};
-            "$repo_base_dir/$dir";
+            "$repo_base_dir/@{[basename($repo)]}";
         };
         if ( $dest_dir !~ m{\A/} ) {
             $dest_dir = "$repo_base_dir/$dest_dir";
         }
+        ( my $basename = $dest_dir ) =~ s{.*/}{};
 
         if ( $k eq 'core' ) {
             $env->{MT_HOME_PATH} = $dest_dir;
@@ -69,18 +69,18 @@ sub handle_recipe {
             my $branch = $data->{$k}{branch} || '';
 
             for my $pr ( split /\s+/, $pull_reqs ) {
-                my ($pr_repo, $pr_id) = ($pr =~ m{([^/]+)/(pull/\d+)});
+                my ( $pr_repo, $pr_id ) = ( $pr =~ m{([^/]+)/(pull/\d+)} );
                 next unless $pr_repo && $pr_id;
-                $branch = $pr_id . '/head' if basename($dest_dir) eq $pr_repo;
+                $branch = $pr_id . '/head' if $basename eq $pr_repo;
             }
 
             {
                 my %repos = map { $_ => 1 } split /\s+/, $repos;
                 for my $r ( keys %repos ) {
-                    my ($bn, $br) = $r =~ m{([^/]+)#(.*)$}
+                    my ( $bn, $br ) = $r =~ m{([^/]+)#(.*)$}
                         or next;
 
-                    next unless basename($dest_dir) eq $bn;
+                    next unless $basename eq $bn;
 
                     $branch = $br;
                     delete $repos{$r};
@@ -96,6 +96,8 @@ sub handle_recipe {
             die "$res\nGot an error: git rev-parse HEAD" if $?;
             print STDERR "$k:$res";
         }
+
+        push @volumes, "      - '$dest_dir:/src/$basename:\${DOCKER_VOLUME_MOUNT_FLAG:-rw}'";
 
         next if $k eq 'core';
 
@@ -146,12 +148,13 @@ YAML
 }
 
 for my $recipe ( split /\s+/, $recipes ) {
-    my $recipe_file = ( $recipe =~ m{^[/\.]} && -e $recipe )
+    my $recipe_file
+        = ( $recipe =~ m{^[/\.]} && -e $recipe )
         ? realpath($recipe)
         : do {
-            $recipe =~ s{\.yaml\z}{};
-            $recipe .= '.yaml';
-            "$recipe_dir/$recipe";
+        $recipe =~ s{\.yaml\z}{};
+        $recipe .= '.yaml';
+        "$recipe_dir/$recipe";
         };
 
     # get recipe

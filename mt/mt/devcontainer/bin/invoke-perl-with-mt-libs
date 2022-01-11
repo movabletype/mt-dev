@@ -3,18 +3,14 @@
 use File::Find qw(find);
 
 my @libs = qw(
-    /var/www/cgi-bin/mt/lib
-    /var/www/cgi-bin/mt/extlib
+    /src/movabletype/lib
+    /src/movabletype/extlib
 );
 
 find(sub {
     push(@libs, $File::Find::name)
         if -d $File::Find::name && $_ =~ m/^(?:ext)?lib$/;
-}, qw(
-    /var/www/cgi-bin/mt/t
-    /var/www/cgi-bin/mt/plugins
-    /var/www/cgi-bin/mt/addons
-));
+}, map { glob($_) } qw(/src/*/t /src/*/plugins /src/*/addons));
 
 $ENV{PERL5LIB} = join(':', @libs);
 exec '/usr/bin/perl', @ARGV;
