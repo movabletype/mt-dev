@@ -1,4 +1,7 @@
+ARG DOCKER_NODEJS_IMAGE="node:16.13.2"
 ARG DOCKER_MT_IMAGE
+
+FROM ${DOCKER_NODEJS_IMAGE} as node
 FROM ${DOCKER_MT_IMAGE}
 
 # [Option] Install zsh
@@ -24,5 +27,9 @@ RUN cpm install -g \
     PLS Perl::LanguageServer
 
 COPY bin/* /usr/local/bin/
+
+COPY --from=node /usr/local/bin/ /usr/local/bin/
+COPY --from=node /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+COPY --from=node /opt/ /opt/
 
 USER vscode
