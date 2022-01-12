@@ -120,7 +120,7 @@ sub handle_recipe {
         }
 
         for my $l (@$links) {
-            push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l:\${DOCKER_VOLUME_MOUNT_FLAG}'";
+            push @volumes, "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l:\${DOCKER_VOLUME_MOUNT_FLAG:-rw}'";
         }
     }
 

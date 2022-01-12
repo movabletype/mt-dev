@@ -11,10 +11,10 @@ services:
       DOCKER_MT_SERVICES: ${DOCKER_MT_SERVICES}
     volumes:
       - "..:/mt-dev"
-      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "${BASE_SITE_PATH:-site}:/var/www/html:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "support:/var/www/cgi-bin/mt/mt-static/support:${DOCKER_VOLUME_MOUNT_FLAG}"
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "${BASE_SITE_PATH:-site}:/var/www/html:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "support:/var/www/cgi-bin/mt/mt-static/support:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
       # override entrypoint
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
     labels:
@@ -26,10 +26,10 @@ services:
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     volumes:
       - "..:/mt-dev"
-      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "${BASE_SITE_PATH:-site}:/var/www/html:${DOCKER_VOLUME_MOUNT_FLAG}"
-      - "support:/var/www/cgi-bin/mt/mt-static/support:${DOCKER_VOLUME_MOUNT_FLAG}"
+      - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "${MT_CONFIG_CGI_SRC_PATH:-../mt-config.cgi-original}:${MT_CONFIG_CGI_DEST_PATH:-/var/www/cgi-bin/mt/mt-config.cgi}:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "${BASE_SITE_PATH:-site}:/var/www/html:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
+      - "support:/var/www/cgi-bin/mt/mt-static/support:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
       # override entrypoint
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
       # proxy setting
