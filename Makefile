@@ -18,6 +18,9 @@ endif
 ifneq (${PERL},)
 DOCKER_MT_IMAGE=movabletype/test:perl-${PERL}
 endif
+ifneq (${NODE},)
+DOCKER_NODEJS_IMAGE=node:${NODE}
+endif
 ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
 endif
@@ -25,6 +28,7 @@ endif
 export DOCKER_MT_BUILD_CONTEXT
 export DOCKER_MT_IMAGE
 export DOCKER_MT_SERVICES
+export DOCKER_NODEJS_IMAGE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MEMCACHED_IMAGE

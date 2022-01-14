@@ -4,6 +4,7 @@ services:
     build:
       context: ${DOCKER_MT_BUILD_CONTEXT:-mt/default}
       args:
+        - DOCKER_NODEJS_IMAGE=${DOCKER_NODEJS_IMAGE:-node:16.13.2}
         - DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE:-movabletype/test:perl-5.28}
     restart: always
     working_dir: /var/www/cgi-bin/mt
