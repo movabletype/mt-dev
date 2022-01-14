@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+* Also skip `git fetch` when "$UPDATE_BRANCH" is "no".
+
 ## [1.1.1] - 2022-01-03
 
 ### Changed
