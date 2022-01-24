@@ -25,6 +25,7 @@ ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
 endif
 
+export DOCKER_COMPOSE_USER_YAML
 export DOCKER_MT_BUILD_CONTEXT
 export DOCKER_MT_IMAGE
 export DOCKER_MT_SERVICES
@@ -64,7 +65,7 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES}
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_USER_YAML}
 
 
 .PHONY: db up down
@@ -133,15 +134,16 @@ ifneq (${PR},)
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" PR="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
+up-common-invoke-docker-compose: _DC_YAML_OVERRIDE=-f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE}
 up-common-invoke-docker-compose: setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} pull
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} build
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} up ${UP_ARGS}
+	${_DC} pull
+	${_DC} build
+	${_DC} up ${UP_ARGS}
 
 
 ifneq (${REMOVE_VOLUME},)
