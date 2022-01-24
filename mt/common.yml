@@ -25,7 +25,10 @@ services:
       mt-dev.service: "mt"
 
   httpd:
-    image: ${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
+    build:
+      context: ${DOCKER_HTTPD_BUILD_CONTEXT:-httpd/default}
+      args:
+        - DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     volumes:
