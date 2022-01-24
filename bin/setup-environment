@@ -298,11 +298,14 @@ for my $a ( split /\s+/, $archives ) {
     close $ws_fh;
 
     my ( $fh, $file ) = tmpnam();
-    print $fh Dump(
-        {   version  => "3",
-            services => { mt => { volumes => [ "$ws_file:/src/mt.code-workspace", ], }, },
-        }
-    );
+    print $fh Dump({
+        version  => "3",
+        services => {
+            map {
+                $_ => { volumes => ["$ws_file:/src/mt.code-workspace",], },
+            } qw(mt httpd)
+        },
+    });
     push @$yamls, $file;
 }
 
