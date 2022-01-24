@@ -310,7 +310,7 @@ for my $a ( split /\s+/, $archives ) {
 }
 
 if (@$yamls) {
-    $env->{DOCKER_COMPOSE_YML_OVERRIDE} = join( ' ', map {"-f $_"} @$yamls );
+    $env->{DOCKER_COMPOSE_YAML_OVERRIDE} = join( ' ', map {"-f $_"} @$yamls );
 }
 
 # output args for make command

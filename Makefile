@@ -3,7 +3,7 @@ MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 export BASE_SITE_PATH=${MAKEFILE_DIR}/site
 export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
-export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
+export DOCKER_COMPOSE_YAML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
 export UPDATE_BRANCH=yes
@@ -64,7 +64,7 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES}
 
 
 .PHONY: db up down
@@ -139,9 +139,9 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} pull
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} build
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
+	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} pull
+	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} build
+	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE} up ${UP_ARGS}
 
 
 ifneq (${REMOVE_VOLUME},)
