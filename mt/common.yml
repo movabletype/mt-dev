@@ -14,6 +14,8 @@ services:
       NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
       MT_DEV_UPDATE_BRANCH: ${UPDATE_BRANCH:-yes}
       DOCKER_MT_SERVICES: ${DOCKER_MT_SERVICES}
+      APACHE_LOG_DIR: ${APACHE_LOG_DIR:-/tmp/apache2/log}
+      APACHE_PID_FILE: ${APACHE_PID_FILE:-/tmp/apache2/run/apache2.pid}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
@@ -33,6 +35,9 @@ services:
         - DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
+    environment:
+      APACHE_LOG_DIR: ${APACHE_LOG_DIR:-/tmp/apache2/log}
+      APACHE_PID_FILE: ${APACHE_PID_FILE:-/tmp/apache2/run/apache2.pid}
     volumes:
       - "..:/mt-dev"
       - "${MT_HOME_PATH:-../../movabletype}:/var/www/cgi-bin/mt:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
