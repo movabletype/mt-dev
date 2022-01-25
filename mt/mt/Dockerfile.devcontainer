@@ -13,16 +13,19 @@ ARG UPGRADE_PACKAGES="false"
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-COPY devcontainer/library-scripts/*.sh /tmp/library-scripts/
+COPY devcontainer/build-script/*.sh /tmp/build-script/
 RUN apt-get update \
-    && /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
+    && /bin/bash /tmp/build-script/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/build-script
+
+COPY build-script/*.sh /tmp/build-script/
+RUN /bin/bash /tmp/build-script/apache2.sh \
+    && rm -rf /tmp/build-script
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
         g++ libio-aio-perl \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
 RUN cpm install -g \
     PLS Perl::LanguageServer
 
