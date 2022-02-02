@@ -14,7 +14,7 @@ You can launch the container with customizations of your choice.
 And the development container configuration for Visual Studio Code is included by default.
 
 ```
-$ make up-psgi ... DOCKER_MT_BUILD_CONTEXT=mt/devcontainer REPO="$HOME/src/github.com/username/mt-plugin-AwesomePlugin
+$ make up-psgi ... DOCKER_MT_DOCKERFILE=Dockerfile.devcontainer REPO="$HOME/src/github.com/username/mt-plugin-AwesomePlugin
 ```
 
 ### Changed
