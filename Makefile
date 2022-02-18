@@ -3,7 +3,7 @@ MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 export BASE_SITE_PATH=${MAKEFILE_DIR}/site
 export DOCKER=docker
 export DOCKER_COMPOSE=docker-compose
-export DOCKER_COMPOSE_YML_MIDDLEWARES=-f ./mt/mysql.yml -f ./mt/memcached.yml
+export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS=-d
 export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
 export UPDATE_BRANCH=yes
@@ -18,12 +18,21 @@ endif
 ifneq (${PERL},)
 DOCKER_MT_IMAGE=movabletype/test:perl-${PERL}
 endif
+ifneq (${NODE},)
+DOCKER_NODEJS_IMAGE=node:${NODE}
+endif
 ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
 endif
 
+export DOCKER_COMPOSE_USER_YAML
+export DOCKER_MT_BUILD_CONTEXT
+export DOCKER_MT_DOCKERFILE
 export DOCKER_MT_IMAGE
 export DOCKER_MT_SERVICES
+export DOCKER_NODEJS_IMAGE
+export DOCKER_HTTPD_BUILD_CONTEXT
+export DOCKER_HTTPD_DOCKERFILE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MEMCACHED_IMAGE
@@ -58,7 +67,7 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YML_MIDDLEWARES}
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_USER_YAML}
 
 
 .PHONY: db up down
@@ -127,14 +136,16 @@ ifneq (${PR},)
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" PR="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
 
+up-common-invoke-docker-compose: _DC_YAML_OVERRIDE=-f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE}
 up-common-invoke-docker-compose: setup-mysql-volume
 	@echo MT_HOME_PATH=${MT_HOME_PATH}
 	@echo BASE_SITE_PATH=${BASE_SITE_PATH}
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} pull
-	${_DC} -f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YML_OVERRIDE} up ${UP_ARGS}
+	${_DC} pull
+	${_DC} build
+	${_DC} up ${UP_ARGS}
 
 
 ifneq (${REMOVE_VOLUME},)
