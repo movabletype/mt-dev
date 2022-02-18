@@ -1,0 +1,38 @@
+ARG DOCKER_NODEJS_IMAGE
+ARG DOCKER_MT_IMAGE
+
+FROM ${DOCKER_NODEJS_IMAGE} as node
+FROM ${DOCKER_MT_IMAGE}
+
+# [Option] Install zsh
+ARG INSTALL_ZSH="true"
+# [Option] Upgrade OS packages to their latest versions
+ARG UPGRADE_PACKAGES="false"
+
+# Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+COPY devcontainer/build-script/*.sh /tmp/build-script/
+RUN apt-get update \
+    && /bin/bash /tmp/build-script/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/build-script
+
+COPY build-script/*.sh /tmp/build-script/
+RUN /bin/bash /tmp/build-script/apache2.sh \
+    && rm -rf /tmp/build-script
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+        g++ libio-aio-perl \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+RUN cpm install -g \
+    PLS Perl::LanguageServer
+
+COPY devcontainer/bin/* /usr/local/bin/
+
+COPY --from=node /usr/local/bin/ /usr/local/bin/
+COPY --from=node /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+COPY --from=node /opt/ /opt/
+
+USER vscode

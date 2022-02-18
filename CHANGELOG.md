@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Customized Docker containers (experimental feature)
+
+You can launch the container with customizations of your choice.
+And the development container configuration for Visual Studio Code is included by default.
+
+```
+$ make up-psgi ... DOCKER_MT_DOCKERFILE=Dockerfile.devcontainer REPO="$HOME/src/github.com/username/mt-plugin-AwesomePlugin
+```
+
+### Changed
+
+* Also skip `git fetch` when "$UPDATE_BRANCH" is "no".
+
 ## [1.1.1] - 2022-01-03
 
 ### Changed

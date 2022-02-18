@@ -9,11 +9,10 @@ if [ ! -e $dir ]; then
     git clone $repo $dir
 fi
 
-cd $dir
-git fetch --all --prune
-git fetch --tags --prune
-
 if [ "$UPDATE_BRANCH" = "yes" -o "$UPDATE_BRANCH" = "1" ] && [ -n "$branch" ]; then
+    cd $dir
+    git fetch --all --tags --prune
+
     git checkout .
     git clean -f
 

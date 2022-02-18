@@ -1,0 +1,29 @@
+ARG DOCKER_HTTPD_IMAGE
+
+FROM ${DOCKER_HTTPD_IMAGE}
+
+# [Option] Install zsh
+ARG INSTALL_ZSH="true"
+# [Option] Upgrade OS packages to their latest versions
+ARG UPGRADE_PACKAGES="false"
+
+# Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+COPY devcontainer/build-script/*.sh /tmp/build-script/
+RUN apt-get update \
+    && /bin/bash /tmp/build-script/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/build-script
+
+COPY build-script/*.sh /tmp/build-script/
+RUN /bin/bash /tmp/build-script/apache2.sh \
+    && rm -rf /tmp/build-script
+
+RUN set -ex && \
+  docker-php-ext-install mysqli && \
+  pecl install xdebug && \
+  docker-php-ext-enable xdebug
+COPY devcontainer/etc/mt-xdebug.ini /usr/local/etc/php/conf.d/mt-xdebug.ini
+
+USER vscode

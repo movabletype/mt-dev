@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use File::Find qw(find);
+
+my @libs = qw(
+    /src/movabletype/lib
+    /src/movabletype/extlib
+);
+
+find(sub {
+    push(@libs, $File::Find::name)
+        if -d $File::Find::name && $_ =~ m/^(?:ext)?lib$/;
+}, map { glob($_) } qw(/src/*/t /src/*/plugins /src/*/addons));
+
+$ENV{PERL5LIB} = join(':', @libs);
+exec '/usr/bin/perl', @ARGV;
