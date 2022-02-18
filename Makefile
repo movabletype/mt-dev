@@ -1,12 +1,12 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-export BASE_SITE_PATH=${MAKEFILE_DIR}/site
-export DOCKER=docker
-export DOCKER_COMPOSE=docker-compose
+export BASE_SITE_PATH:=${MAKEFILE_DIR}/site
+export DOCKER:=docker
+export DOCKER_COMPOSE:=${shell ${DOCKER} compose >/dev/null 2>&1 && echo 'docker compose' || echo 'docker-compose'}
 export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
-export UP_ARGS=-d
-export MT_HOME_PATH=${MAKEFILE_DIR}/../movabletype
-export UPDATE_BRANCH=yes
+export UP_ARGS:=-d
+export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
+export UPDATE_BRANCH:=yes
 
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
