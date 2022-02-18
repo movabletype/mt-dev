@@ -32,7 +32,7 @@ services:
       context: ${DOCKER_HTTPD_BUILD_CONTEXT:-httpd}
       dockerfile: ${DOCKER_HTTPD_DOCKERFILE}
       args:
-        - DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE:-movabletype/test:php-7.3}
+        - DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE:-movabletype/test:php-8.0}
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     environment:
