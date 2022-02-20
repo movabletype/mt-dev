@@ -6,6 +6,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-02-21
+
+### Added
+
+#### Customized Docker containers
+
+You can launch the container with customizations of your choice.
+And the development container configuration for Visual Studio Code is included by default.
+
+```
+$ make up-psgi ... DOCKER_MT_DOCKERFILE=Dockerfile.devcontainer REPO="$HOME/src/github.com/username/mt-plugin-AwesomePlugin"
+```
+
+#### Support mount flag (especially for Docker for Mac)
+
+Docker for Mac has slow file access on bind mounts, but if you use a dev container, using :delegated may improve the situation.
+
+```
+$ make up-psgi ... DOCKER_VOLUME_MOUNT_FLAG=delegated
+```
+
+### Changed
+
+* Also skip `git fetch` when "$UPDATE_BRANCH" is "no".
+* Rename environment variable DOCKER_COMPOSE_YML_MIDDLEWARES to DOCKER_COMPOSE_YAML_MIDDLEWARES
+
 ## [1.1.1] - 2022-01-03
 
 ### Changed
