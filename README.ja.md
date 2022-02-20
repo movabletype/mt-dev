@@ -36,7 +36,7 @@ $ vagrant mt-dev up ARCHIVE=MT7-R0000.zip
 $ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8mb4 */'
 ```
 
-http://192.168.7.25/cgi-bin/mt/mt.cgi を開くとインストール画面になります。
+http://192.168.58.25/cgi-bin/mt/mt.cgi を開くとインストール画面になります。
 
 mt-config.cgiは、mt-dev/mt-config.cgi（またはなければmt-config.cgi-original）が使われます。
 
