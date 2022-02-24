@@ -1,22 +1,24 @@
 #!/bin/sh
 
+[ "$(id -u)" -eq 0 ] && SUDO= || SUDO=sudo
+
 if [ -n "$DOCKER_MT_SERVICES"  ]; then
     for s in $DOCKER_MT_SERVICES; do
-        service $s start
+        $SUDO service $s start
     done
 fi
 
 if [ -n "$DOCKER_MT_CPANFILES"  ]; then
     for f in $DOCKER_MT_CPANFILES; do
         if [ -f $f ]; then
-            cpm install -g --cpanfile=$f
+            $SUDO cpm install -g --cpanfile=$f
         fi
     done
 fi
 
-chmod 777 /var/www/html
-chmod 777 /var/www/cgi-bin/mt/mt-static/support
-chmod 777 /var/www/cgi-bin/mt/themes
+$SUDO chmod 777 /var/www/html
+$SUDO chmod 777 /var/www/cgi-bin/mt/mt-static/support
+$SUDO chmod 777 /var/www/cgi-bin/mt/themes
 
 if [ "$1" = "apache2-foreground" ]; then
     # invoke php-fpm
