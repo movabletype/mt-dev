@@ -6,6 +6,14 @@ if [ -n "$DOCKER_MT_SERVICES"  ]; then
     done
 fi
 
+if [ -n "$DOCKER_MT_CPANFILES"  ]; then
+    for f in $DOCKER_MT_CPANFILES; do
+        if [ -f $f ]; then
+            cpm install -g --cpanfile=$f
+        fi
+    done
+fi
+
 chmod 777 /var/www/html
 chmod 777 /var/www/cgi-bin/mt/mt-static/support
 chmod 777 /var/www/cgi-bin/mt/themes
