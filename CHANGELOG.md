@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+Added support for specifying the cpanfile to be referenced at startup with DOCKER_MT_CPANFILES.
+The default value is t/cpanfile.
+
 ## [2.0.0] - 2022-02-21
 
 ### Added

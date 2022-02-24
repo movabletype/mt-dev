@@ -14,6 +14,7 @@ services:
       NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
       MT_DEV_UPDATE_BRANCH: ${UPDATE_BRANCH:-yes}
       DOCKER_MT_SERVICES: ${DOCKER_MT_SERVICES}
+      DOCKER_MT_CPANFILES: ${DOCKER_MT_CPANFILES}
       APACHE_LOG_DIR: ${APACHE_LOG_DIR:-/tmp/apache2/log}
       APACHE_PID_FILE: ${APACHE_PID_FILE:-/tmp/apache2/run/apache2.pid}
     volumes:

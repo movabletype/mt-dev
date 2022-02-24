@@ -7,6 +7,7 @@ export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export UPDATE_BRANCH:=yes
+export DOCKER_MT_CPANFILES:=t/cpanfile
 
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
 BASE_ARCHIVE_PATH=${MAKEFILE_DIR}/archive
@@ -30,6 +31,7 @@ export DOCKER_MT_BUILD_CONTEXT
 export DOCKER_MT_DOCKERFILE
 export DOCKER_MT_IMAGE
 export DOCKER_MT_SERVICES
+export DOCKER_MT_CPANFILES
 export DOCKER_NODEJS_IMAGE
 export DOCKER_HTTPD_BUILD_CONTEXT
 export DOCKER_HTTPD_DOCKERFILE
