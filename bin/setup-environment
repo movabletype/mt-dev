@@ -58,6 +58,9 @@ sub handle_recipe {
     my @volumes;
     for my $k ( keys %$data ) {
         my $repo     = $data->{$k}{location};
+        if (($ENV{CODESPACES} || '') eq 'true') {
+            $repo =~ s{^git\@github.com:}{https://github.com/};
+        }
         my $dest_dir = $data->{$k}{directory} || do {
             "$repo_base_dir/@{[basename($repo)]}";
         };
