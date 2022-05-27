@@ -1,0 +1,14 @@
+{
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "movabletype/*": {
+          "permissions": "write-all"
+        }
+      }
+    }
+  },
+  "features": {
+    "docker-in-docker": "latest"
+  }
+}
