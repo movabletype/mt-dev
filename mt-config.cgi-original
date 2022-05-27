@@ -12,13 +12,13 @@
 ################################################################
 
 # The CGIPath is the URL to your Movable Type directory
-CGIPath    http://192.168.58.25/cgi-bin/mt/
+CGIPath    /cgi-bin/mt/
 
 # The StaticWebPath is the URL to your mt-static directory
 # Note: Check the installation documentation to find out 
 # whether this is required for your environment.  If it is not,
 # simply remove it or comment out the line by prepending a "#".
-StaticWebPath    http://192.168.58.25/mt-static
+StaticWebPath    /mt-static
 
 #================ DATABASE SETTINGS ==================
 #   CHANGE setting below that refer to databases 
