@@ -26,7 +26,7 @@ mod_proxy_so=`find $module_dirs -name 'mod_proxy.so' 2>/dev/null | head -1`
 if [ -n "$mod_proxy_so" ]; then
     cat > $httpd_conf_d/mt-proxy.conf <<CONF
 LoadModule proxy_module $mod_proxy_so
-ProxyPassReverse / http://mt/
+ProxyPreserveHost on
 CONF
 fi
 
@@ -34,7 +34,7 @@ mod_proxy_http_so=`find $module_dirs -name 'mod_proxy_http.so' 2>/dev/null | hea
 if [ -n "$mod_proxy_http_so" ]; then
     cat > $httpd_conf_d/mt-proxy_http.conf <<CONF
 LoadModule proxy_http_module $mod_proxy_http_so
-ProxyPassReverse / http://mt/
+ProxyPreserveHost on
 CONF
 fi
 
