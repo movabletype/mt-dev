@@ -7,6 +7,7 @@ export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export UPDATE_BRANCH:=yes
+export CREATE_DATABASE_IF_NOT_EXISTS:=yes
 export DOCKER_MT_CPANFILES:=t/cpanfile
 
 MT_CONFIG_CGI=${shell [ -e mt-config.cgi ] && echo mt-config.cgi || echo mt-config.cgi-original}
@@ -70,7 +71,7 @@ $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_USER_YAML}
-
+_DATABASE=${shell perl -ne 'print $$1 if /^Database\s+([\w-]+)/' < ${MT_CONFIG_CGI_SRC_PATH}}
 
 .PHONY: db up down
 
@@ -147,6 +148,13 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	${_DC} pull
 	${_DC} build
+ifeq (${CREATE_DATABASE_IF_NOT_EXISTS},yes)
+	${_DC} up db -d
+	@while ! ${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'SELECT 1'" >/dev/null 2>&1; do \
+		sleep 1; \
+	done
+	${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'CREATE DATABASE IF NOT EXISTS \`${_DATABASE}\` /* DEFAULT CHARACTER SET utf8mb4 */;'"
+endif
 	${_DC} up ${UP_ARGS}
 
 
