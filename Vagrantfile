@@ -165,8 +165,12 @@ Vagrant.configure("2") do |config|
     adduser vagrant docker
   SHELL
 
-  config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb, override|
     vb.memory = ENV["VM_VB_MEMORY"] || 2048
     vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+
+    override.vm.network :forwarded_port,
+      guest: ENV["HTTPD_EXPOSE_PORT"] || 80,
+      host: ENV["VM_VB_HTTP_PORT"] || ENV["HTTPD_EXPOSE_PORT"] || 5825
   end
 end
