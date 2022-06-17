@@ -6,10 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-06-18
+
 ### Added
 
-Added support for specifying the cpanfile to be referenced at startup with DOCKER_MT_CPANFILES.
-The default value is t/cpanfile.
+* Added support for specifying the cpanfile to be referenced at startup with DOCKER_MT_CPANFILES.
+    * The default value is t/cpanfile.
+* CGIPath and StaticWebPath can now be specified relative to the host.
+* The database specified in mt-config.cgi is now automatically created if it does not exist.
+    * If you do not want to create it automatically, you can skip this behavior by specifying `CREATE_DATABASE_IF_NOT_EXISTS:=yes`.
+* In the Vagrant environment, we have added a setting to forward the host's port to the guest.
+    * The default value is 5825, which can be accessed at http://localhost:5825/cgi-bin/mt/mt.cgi.
+    * You can change this value with the `VM_VB_HTTP_PORT` or `HTTPD_EXPOSE_PORT` environment variables.
 
 ## [2.0.0] - 2022-02-21
 
