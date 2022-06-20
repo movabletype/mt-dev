@@ -149,7 +149,7 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	${_DC} pull
 	${_DC} build
 ifeq (${CREATE_DATABASE_IF_NOT_EXISTS},yes)
-	${_DC} up db -d
+	${_DC} up -d db
 	@while ! ${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'SELECT 1'" >/dev/null 2>&1; do \
 		sleep 1; \
 	done
