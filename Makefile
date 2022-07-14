@@ -147,7 +147,7 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
 	${_DC} pull
-	${_DC} build
+	${_DC} build --pull
 ifeq (${CREATE_DATABASE_IF_NOT_EXISTS},yes)
 	${_DC} up -d db
 	@while ! ${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'SELECT 1'" >/dev/null 2>&1; do \
