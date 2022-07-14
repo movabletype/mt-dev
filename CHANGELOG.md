@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+* Ignore errors when deleting temporary files.
+* Use the `--pull` option to always use the latest image.
+
 ## [2.1.1] - 2022-06-20
 
 ### Fixed
