@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Ignore errors when deleting temporary files.
 * Use the `--pull` option to always use the latest image.
+* Accept "/" and "-" in branch names specified in `REPO`.
 
 ## [2.1.1] - 2022-06-20
 

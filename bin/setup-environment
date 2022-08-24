@@ -223,7 +223,7 @@ for my $r ( split /\s+/, $repos ) {
     # get repo
     if ( !-d $directory ) {
         my $branch = '';
-        $branch = $1 if $r =~ s/(?:#(\w+))\z//;
+        $branch = $1 if $r =~ s{(?:#([\w/-]+))\z}{};
 
         my $k = basename($r);
         $directory = catfile( $repo_base_dir, $k );
