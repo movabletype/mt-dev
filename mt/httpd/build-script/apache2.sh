@@ -65,3 +65,8 @@ LoadModule env_module $mod_env_so
 PassEnv NLS_LANG
 CONF
 fi
+
+cat > /etc/php-fpm.d/mt-env.conf <<CONF
+[www]
+clear_env = no
+CONF
