@@ -37,6 +37,7 @@ services:
     restart: always
     entrypoint: "/usr/local/bin/docker-entrypoint.sh"
     environment:
+      NLS_LANG: ${NLS_LANG:-Japanese_Japan.UTF8}
       APACHE_LOG_DIR: ${APACHE_LOG_DIR:-/tmp/apache2/log}
       APACHE_PID_FILE: ${APACHE_PID_FILE:-/tmp/apache2/run/apache2.pid}
     volumes:
