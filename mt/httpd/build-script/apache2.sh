@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 conf_dirs="/etc/httpd/conf.d /etc/apache2/conf-enabled /etc/httpd/conf/extra"
 module_dirs="/usr/lib/apache2/modules /usr/lib64/httpd/modules /usr/lib/httpd/modules"
@@ -65,8 +65,3 @@ LoadModule env_module $mod_env_so
 PassEnv NLS_LANG
 CONF
 fi
-
-cat > /etc/php-fpm.d/mt-env.conf <<CONF
-[www]
-clear_env = no
-CONF
