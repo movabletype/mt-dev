@@ -1,0 +1,18 @@
+{
+  // "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
+  // "features": {
+  //   "docker-in-docker": "latest"
+  // },
+  // "remoteUser": "vscode",
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "movabletype/*": {
+          "permissions": "write-all"
+        }
+      }
+    }
+  },
+  "extensions": ["mortenhenriksen.perl-debug", "d9705996.perl-toolbox"]
+}
