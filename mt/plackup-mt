@@ -1,6 +1,7 @@
 #!/bin/bash
 
 exec starman \
+    -Iextlib \
     -MCGI \
     -MFile::Spec \
     -MCGI::Cookie \
