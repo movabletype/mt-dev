@@ -1,13 +1,15 @@
 FROM perl:5.34
 
-ENV DOCKER_VERSION=20.10.7
+ARG TARGETARCH
+ARG DOCKER_VERSION=20.10.9
 
 ## docker
 RUN set -ex \
     \
     && mkdir /tmp/docker \
     && cd /tmp/docker \
-    && curl -sL https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz -o docker.tgz \
+    && case "${TARGETARCH}" in arm64) platform=aarch64;; *) platform=x86_64;; esac \
+    && curl -sL https://download.docker.com/linux/static/stable/${platform}/docker-${DOCKER_VERSION}.tgz -o docker.tgz \
     && tar zxf docker.tgz \
     && mv docker/docker /usr/bin/docker \
     && rm -fr /tmp/docker
