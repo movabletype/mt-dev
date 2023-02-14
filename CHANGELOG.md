@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2023-02-15
+
+### Added
+
+* Can now be lunched in an arm64 environment.
+
 ## [2.1.2] - 2022-08-24
 
 ### Fixed
