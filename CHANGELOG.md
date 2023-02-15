@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Introduce UPDATE_DOCKER_IMAGE environment variable.
+    * Setting this environment variable to "no" will skip updating the Docker image during `make up`.
+
 ## [2.2.0] - 2023-02-15
 
 ### Added

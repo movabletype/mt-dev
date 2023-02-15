@@ -7,6 +7,7 @@ export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export UPDATE_BRANCH:=yes
+export UPDATE_DOCKER_IMAGE:=yes
 export CREATE_DATABASE_IF_NOT_EXISTS:=yes
 export DOCKER_MT_CPANFILES:=t/cpanfile
 
@@ -146,8 +147,10 @@ up-common-invoke-docker-compose: setup-mysql-volume
 	@echo DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}
 	@echo DOCKER_HTTPD_IMAGE=${DOCKER_HTTPD_IMAGE}
 	@echo DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}
+ifeq (${UPDATE_DOCKER_IMAGE},yes)
 	${_DC} pull
 	${_DC} build --pull
+endif
 ifeq (${CREATE_DATABASE_IF_NOT_EXISTS},yes)
 	${_DC} up -d db
 	@while ! ${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'SELECT 1'" >/dev/null 2>&1; do \
