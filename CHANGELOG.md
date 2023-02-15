@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Introduce UPDATE_DOCKER_IMAGE environment variable.
     * Setting this environment variable to "no" will skip updating the Docker image during `make up`.
 
+### Changed
+
+* Refactored Dockerfile for mt-watcher.
+    * Ensure that binaries with the appropriate architecture are installed even if BuildKit is disabled.
+    * Reduced image size by using "perl:*-slim" images.
+
 ## [2.2.0] - 2023-02-15
 
 ### Added

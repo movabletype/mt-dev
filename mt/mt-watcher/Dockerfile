@@ -1,20 +1,20 @@
-FROM perl:5.36
+FROM perl:5.36-slim
 
-ARG TARGETARCH
 ARG DOCKER_VERSION=20.10.9
 
-## docker
 RUN set -ex \
     \
+    && apt-get update \
+    && apt-get install -y curl gcc \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
+    ## docker
     && mkdir /tmp/docker \
     && cd /tmp/docker \
-    && case "${TARGETARCH}" in arm64) platform=aarch64;; *) platform=x86_64;; esac \
-    && curl -sL https://download.docker.com/linux/static/stable/${platform}/docker-${DOCKER_VERSION}.tgz -o docker.tgz \
+    && curl -sL https://download.docker.com/linux/static/stable/`arch`/docker-${DOCKER_VERSION}.tgz -o docker.tgz \
     && tar zxf docker.tgz \
     && mv docker/docker /usr/bin/docker \
-    && rm -fr /tmp/docker
-
-## cpan libraries
-RUN set -ex \
-  \
-  && cpanm Filesys::Notify::Simple Linux::Inotify2
+    && rm -fr /tmp/docker \
+    && cd \
+    ## cpan libraries
+    && cpanm Filesys::Notify::Simple Linux::Inotify2 \
+    && apt-get purge -y curl gcc
