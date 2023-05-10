@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Ensure that binaries with the appropriate architecture are installed even if BuildKit is disabled.
     * Reduced image size by using "perl:*-slim" images.
 
+### Fixed
+
+* Add workaround to run amd64 image on arm64.
+
 ## [2.2.0] - 2023-02-15
 
 ### Added
