@@ -23,7 +23,7 @@ $SUDO chmod 777 /var/www/cgi-bin/mt/themes
 if [ "$1" = "apache2-foreground" ]; then
     # invoke php-fpm
     if [ -e /usr/sbin/php-fpm ]; then
-        mkdir /run/php-fpm
+        mkdir -p /run/php-fpm
         /usr/sbin/php-fpm
     fi
 

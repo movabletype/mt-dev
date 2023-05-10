@@ -13,6 +13,9 @@ Timeout 3600
 
 # mt-static
 Alias /mt-static/ /var/www/cgi-bin/mt/mt-static/
+
+# Workaround to run amd64 image on arm64
+Mutex posixsem
 CONF
 
 mod_rewrite_so=`find $module_dirs -name 'mod_rewrite.so' 2>/dev/null | head -1`
