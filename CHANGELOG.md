@@ -6,10 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2023-07-13
+
 ### Added
 
 * Introduce UPDATE_DOCKER_IMAGE environment variable.
     * Setting this environment variable to "no" will skip updating the Docker image during `make up`.
+* ARCHIVE can now be specified in the recipe yaml file.
+    * Specify url and integrity in the following format
+
+```yaml
+mt-plugin-MTBlockEditor:
+  archive:
+    url: https://github.com/movabletype/mt-plugin-MTBlockEditor/releases/download/v1.1.10/MTBlockEditor-1.1.10.tar.gz
+    integrity: sha512-VCrI5B/cv4FAEV7O9GPOsJGEATwRcw4GqjVCWZiMPSkC9jx2l0kjnTXl6M2Xvv/x6THnPQj9VgxX9B0MG7a25g==
+```
 
 ### Changed
 
