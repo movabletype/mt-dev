@@ -8,15 +8,17 @@ use FindBin;
 use lib "$FindBin::Bin/local/lib/perl5";
 
 use Cwd qw(realpath getcwd);
+use File::Path qw(mkpath);
 use IO::File;
 use JSON::PP qw(encode_json);
 use Data::Dumper;
 use Digest::MD5;
+use Digest::SHA;
 use Getopt::Long;
 use HTTP::Tiny;
 use Config::Tiny;
 use YAML::Tiny qw(LoadFile Dump);
-use File::Basename qw(basename fileparse);
+use File::Basename qw(basename fileparse dirname);
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempfile tmpnam tempdir);
 
@@ -57,6 +59,50 @@ sub handle_recipe {
     # checout branch and collect links
     my @volumes;
     for my $k ( keys %$data ) {
+        if (my $archive = $data->{$k}{archive}) {
+            my $url       = $archive->{url};
+            my $integrity = $archive->{integrity};
+
+            die "archive url and integrity is required: $k"
+                unless $url && $integrity;
+
+            my $basename  = basename($url);
+            my $rel_path  = catfile($k,           $basename);
+            my $full_path = catfile($archive_dir, $rel_path);
+
+            my ($algorithm) = $integrity =~ m{\Asha(\d+)};
+            my $sha = Digest::SHA->new($algorithm);
+
+            if (-f $full_path) {
+                $sha->addfile(IO::File->new($full_path, 'r'));
+                my $digest = "sha$algorithm-" . $sha->base64_padded_digest;
+                if ($digest eq $integrity) {
+                    $archives .= " $rel_path";
+                    next;
+                }
+            }
+
+            mkpath(dirname($full_path));
+            my $response = HTTP::Tiny->new->get($url);
+            die "Failed: @{[Dumper($response)]}"
+                unless $response->{success} && length $response->{content};
+
+            $sha->add($response->{content});
+            my $digest = "sha$algorithm-" . $sha->base64_padded_digest;
+            if ($digest ne $integrity) {
+                die "intergrity check failed: $url";
+            }
+
+            my $fh = IO::File->new($full_path, 'w')
+                or die "Can't open $full_path: $!";
+            print $fh $response->{content};
+            close $fh;
+
+            $archives .= " $rel_path";
+
+            next;
+        }
+
         my $repo     = $data->{$k}{location};
         if (($ENV{CODESPACES} || '') eq 'true') {
             $repo =~ s{^git\@github.com:}{https://github.com/};
@@ -244,6 +290,8 @@ for my $r ( split /\s+/, $repos ) {
 }
 
 for my $a ( split /\s+/, $archives ) {
+    next unless $a;
+
     my $file_path;
     my ( $basename, $ext ) = ( fileparse( $a, qr/\.[a-zA-Z\.]+$/ ) )[ 0, 2 ];
 
