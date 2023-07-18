@@ -42,6 +42,24 @@ my $workspace = {
     settings => {},
 };
 
+sub _check_integrity {
+    my ($integrity, $file_or_content) = @_;
+
+    my ($algorithm) = $integrity =~ m{\Asha(\d+)};
+    my $sha = Digest::SHA->new($algorithm);
+    if (ref $file_or_content) {
+
+        $sha->addfile($file_or_content);
+    } else {
+        $sha->add($file_or_content);
+    }
+    my $digest = $sha->b64digest;
+    $digest .= ('=' x ((4 - (length($digest) % 4)) % 4));
+    my $file_integrity = "sha256-" . $digest;
+
+    return $integrity eq ("sha$algorithm-" . $digest);
+}
+
 sub handle_recipe {
     my $data = shift;
 
@@ -70,18 +88,9 @@ sub handle_recipe {
             my $rel_path  = catfile($k,           $basename);
             my $full_path = catfile($archive_dir, $rel_path);
 
-            my ($algorithm) = $integrity =~ m{\Asha(\d+)};
-            my $sha = Digest::SHA->new($algorithm);
-
-            if (-f $full_path) {
-                $sha->addfile(IO::File->new($full_path, 'r'));
-                my $digest = $sha->b64digest;
-                $digest .= ('=' x ((4 - (length($digest) % 4)) % 4));
-                my $file_integrity = "sha$algorithm-" . $digest;
-                if ($file_integrity eq $integrity) {
-                    $archives .= " $rel_path";
-                    next;
-                }
+            if (-f $full_path && _check_integrity($integrity, IO::File->new($full_path, 'r'))) {
+                $archives .= " $rel_path";
+                next;
             }
 
             mkpath(dirname($full_path));
@@ -89,9 +98,7 @@ sub handle_recipe {
             die "Failed: @{[Dumper($response)]}"
                 unless $response->{success} && length $response->{content};
 
-            $sha->add($response->{content});
-            my $digest = "sha$algorithm-" . $sha->base64_padded_digest;
-            if ($digest ne $integrity) {
+            if (!_check_integrity($integrity, $response->{content})) {
                 die "intergrity check failed: $url";
             }
 
