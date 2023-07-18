@@ -75,8 +75,10 @@ sub handle_recipe {
 
             if (-f $full_path) {
                 $sha->addfile(IO::File->new($full_path, 'r'));
-                my $digest = "sha$algorithm-" . $sha->base64_padded_digest;
-                if ($digest eq $integrity) {
+                my $digest = $sha->b64digest;
+                $digest .= ('=' x ((4 - (length($digest) % 4)) % 4));
+                my $file_integrity = "sha$algorithm-" . $digest;
+                if ($file_integrity eq $integrity) {
                     $archives .= " $rel_path";
                     next;
                 }
