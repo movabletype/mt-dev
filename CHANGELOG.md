@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+As shown below, when "archive" is specified by a recipe and "ARCHIVE" is specified by a command line at the same time, the command line has priority over the recipe.
+
+```yaml
+mt-plugin-MTBlockEditor:
+  archive:
+    url: https://github.com/movabletype/mt-plugin-MTBlockEditor/releases/download/v1.1.10/MTBlockEditor-1.1.10.tar.gz
+    integrity: sha512-VCrI5B/cv4FAEV7O9GPOsJGEATwRcw4GqjVCWZiMPSkC9jx2l0kjnTXl6M2Xvv/x6THnPQj9VgxX9B0MG7a25g==
+```
+
+```
+$ make up RECIPE=8.0.0-dp ARCHIVE=MTBlockEditor-1.1.11.tar.gz
+```
+
 ## [2.3.2] - 2023-07-18
 
 ### Fixed

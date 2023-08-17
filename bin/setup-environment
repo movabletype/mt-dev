@@ -89,7 +89,7 @@ sub handle_recipe {
             my $full_path = catfile($archive_dir, $rel_path);
 
             if (-f $full_path && _check_integrity($integrity, IO::File->new($full_path, 'r'))) {
-                $archives .= " $rel_path";
+                $archives = "$rel_path $archives";
                 next;
             }
 
@@ -107,7 +107,7 @@ sub handle_recipe {
             print $fh $response->{content};
             close $fh;
 
-            $archives .= " $rel_path";
+            $archives = "$rel_path $archives";
 
             next;
         }
