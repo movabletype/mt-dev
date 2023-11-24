@@ -1,0 +1,5 @@
+version: "3"
+services:
+  mt:
+    ports:
+      - "${MT_EXPOSE_PORT}:80"

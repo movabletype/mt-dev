@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+#### The command line has priority over the recipe
+
 As shown below, when "archive" is specified by a recipe and "ARCHIVE" is specified by a command line at the same time, the command line has priority over the recipe.
 
 ```yaml
@@ -19,6 +21,14 @@ mt-plugin-MTBlockEditor:
 
 ```
 $ make up RECIPE=8.0.0-dp ARCHIVE=MTBlockEditor-1.1.11.tar.gz
+```
+
+#### Enable to expose port from "mt" container
+
+In "mt" container, "httpd" or "psgi" listens on port 80, so specifying MT_EXPOSE_PORT will allow access to port 80 of the "mt" container from the port number specified in the host environment MT_EXPOSE_PORT.
+
+```
+$ make up-psgi MT_EXPOSE_PORT=5002
 ```
 
 ## [2.3.2] - 2023-07-18

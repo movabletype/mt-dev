@@ -27,6 +27,9 @@ endif
 ifneq (${DB},)
 DOCKER_MYSQL_IMAGE=${DB}
 endif
+ifneq (${MT_EXPOSE_PORT},)
+export DOCKER_COMPOSE_YAML_EXPOSE=-f ./mt/mt-expose.yml
+endif
 
 export DOCKER_COMPOSE_USER_YAML
 export DOCKER_MT_BUILD_CONTEXT
@@ -45,6 +48,7 @@ export DOCKER_FTPD_IMAGE
 export DOCKER_VOLUME_MOUNT_FLAG
 export MT_RUN_VIA
 export HTTPD_EXPOSE_PORT
+export MT_EXPOSE_PORT
 export PLACKUP
 export CMD
 
@@ -71,7 +75,7 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_USER_YAML}
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
 _DATABASE=${shell perl -ne 'print $$1 if /^Database\s+([\w-]+)/' < ${MT_CONFIG_CGI_SRC_PATH}}
 
 .PHONY: db up down
