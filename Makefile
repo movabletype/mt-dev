@@ -156,11 +156,13 @@ ifeq (${UPDATE_DOCKER_IMAGE},yes)
 	${_DC} build --pull
 endif
 ifeq (${CREATE_DATABASE_IF_NOT_EXISTS},yes)
+ifneq (${_DATABASE},)
 	${_DC} up -d db
 	@while ! ${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'SELECT 1'" >/dev/null 2>&1; do \
 		sleep 1; \
 	done
 	${MAKE} exec-mysql MYSQL_COMMAND_ARGS="-e 'CREATE DATABASE IF NOT EXISTS \`${_DATABASE}\` /* DEFAULT CHARACTER SET utf8mb4 */;'"
+endif
 endif
 	${_DC} up ${UP_ARGS}
 

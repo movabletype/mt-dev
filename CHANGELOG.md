@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+* Run `CREATE DATABASE IF NOT EXISTS` only when `Database` is specified in `mt-config.cgi`.
+
 #### The command line has priority over the recipe
 
 As shown below, when "archive" is specified by a recipe and "ARCHIVE" is specified by a command line at the same time, the command line has priority over the recipe.
