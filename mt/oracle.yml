@@ -1,0 +1,15 @@
+version: "3"
+services:
+  db:
+    image: ${DOCKER_ORACLE_IMAGE:-container-registry.oracle.com/database/free:latest}
+    environment:
+      ORACLE_PWD: password
+    volumes:
+      - "${DOCKER_ORACLE_VOLUME:-oracle23c}:/opt/oracle/oradata"
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "$ORACLE_BASE/$RUN_FILE"
+volumes:
+  oracle23c:
+    driver: local
