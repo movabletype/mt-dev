@@ -10,6 +10,7 @@ use lib "$FindBin::Bin/local/lib/perl5";
 use Cwd qw(realpath getcwd);
 use File::Path qw(mkpath);
 use IO::File;
+use IPC::Open3 qw(open3);
 use JSON::PP qw(encode_json);
 use Data::Dumper;
 use Digest::MD5;
@@ -158,6 +159,26 @@ sub handle_recipe {
             $res = `cd $dest_dir && git rev-parse HEAD 2>&1`;
             die "$res\nGot an error: git rev-parse HEAD" if $?;
             print STDERR "$k:$res";
+
+            my $build_cmd = $data->{$k}{build}{command};
+            if ($build_cmd) {
+                my $cur_dir = getcwd();
+                chdir $dest_dir;
+                my ($res, $build_cmd_str);
+                if (ref $build_cmd eq 'ARRAY') {
+                    my $pid = open3( my $in, my $out, my $err, @$build_cmd );
+                    $res .= join('', <$out>) if $out;
+                    $res .= join('', <$err>) if $err;
+                    waitpid($pid, 0);
+                    $build_cmd_str = join(' ', @$build_cmd);
+                }
+                else {
+                    $res = `$build_cmd 2>&1`;
+                    $build_cmd_str = $build_cmd;
+                }
+                chdir $cur_dir;
+                die "$res\nGot an error: $build_cmd_str" if $?;
+            }
         }
 
         push @volumes, "      - '$dest_dir:/src/$basename:\${DOCKER_VOLUME_MOUNT_FLAG:-rw}'";
