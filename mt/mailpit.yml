@@ -1,0 +1,7 @@
+version: "3"
+services:
+  mailpit:
+    image: ${DOCKER_MAILPIT_IMAGE:-axllent/mailpit}
+    restart: always
+    ports:
+      - "${MAILPIT_EXPOSE_PORT:-8025}:8025"
