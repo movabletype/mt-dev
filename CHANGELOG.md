@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2024-08-30
+
+### Changed
+
+Changed the base image to "bento/ubuntu-24.04" when booting via `Vagrant mt-dev`.
+
+To update, you must delete the virtual machine with `vagrant destroy` and then start it again. Removing the virtual machine
+will result in the loss of all database data. If you do not update, you can continue to use 2.5.1 and there is no feature
+difference at this time.
+
 ## [2.5.1] - 2024-08-30
 
 ### Security
