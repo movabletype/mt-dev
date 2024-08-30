@@ -139,13 +139,18 @@ end
 vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.box = "bento/ubuntu-24.04"
   config.vm.network "private_network", ip: vm_private_network_ip
   config.vm.hostname = "mt-dev"
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
   if RUBY_PLATFORM =~ /darwin/
-    config.vm.synced_folder ".", "/home/vagrant/mt-dev", type: "nfs", :mount_options => ["noatime", "vers=3", "udp", "nolock"]
+    config.vm.synced_folder ".",
+        "/home/vagrant/mt-dev",
+        type: "nfs",
+        nfs_version: 4,
+        nfs_udp: false,
+        mount_options: ["noatime", "nolock"]
   else
     config.vm.synced_folder ".", "/home/vagrant/mt-dev"
   end
@@ -155,13 +160,12 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
+    apt-get upgrade -y # apply security update
     apt-get install -y make git zip \
-      docker.io \
+      docker.io docker-compose-v2 docker-buildx \
       mysql-client
     # required by HTTP::Tiny
     apt-get install -y libio-socket-ssl-perl
-    curl -L https://github.com/docker/compose/releases/download/1.26.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
     adduser vagrant docker
   SHELL
 
