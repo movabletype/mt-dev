@@ -16,5 +16,5 @@ RUN set -ex \
     && rm -fr /tmp/docker \
     && cd \
     ## cpan libraries
-    && cpanm Filesys::Notify::Simple Linux::Inotify2 \
+    && cpanm --from https://www.cpan.org Filesys::Notify::Simple Linux::Inotify2 \
     && apt-get purge -y curl gcc
