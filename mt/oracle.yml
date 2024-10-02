@@ -1,4 +1,3 @@
-version: "3"
 services:
   db:
     image: ${DOCKER_ORACLE_IMAGE:-container-registry.oracle.com/database/free:latest}
