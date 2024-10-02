@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update default image version
-  - Perl: 5.38
-  - PHP: 8.3
-  - Node.js: 20.17.1
+* Update default image version.
+  * Perl: 5.38
+  * PHP: 8.3
+  * Node.js: 20.17.1
+* Remove "version" as it is no longer needed in docker compose v2.
 
 ## [2.6.0] - 2024-08-30
 

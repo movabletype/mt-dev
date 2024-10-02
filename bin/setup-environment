@@ -216,7 +216,6 @@ sub handle_recipe {
 
     my ( $fh, $file ) = tmpnam();
     print $fh <<YAML;
-version: "3"
 services:
   mt:
     volumes:
@@ -380,7 +379,6 @@ for my $a ( split /\s+/, $archives ) {
 
     my ( $fh, $file ) = tmpnam();
     print $fh Dump({
-        version  => "3",
         services => {
             map {
                 $_ => { volumes => ["$ws_file:/src/mt.code-workspace",], },

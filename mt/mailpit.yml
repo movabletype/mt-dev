@@ -1,4 +1,3 @@
-version: "3"
 services:
   mailpit:
     image: ${DOCKER_MAILPIT_IMAGE:-axllent/mailpit}

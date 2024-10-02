@@ -1,4 +1,3 @@
-version: "3"
 services:
   db:
     image: ${DOCKER_MYSQL_IMAGE:-mysql:8.0.32}
