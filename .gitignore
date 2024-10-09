@@ -7,3 +7,4 @@
 /.env-*
 /.ssh-config
 .DS_Store
+/.perl-local

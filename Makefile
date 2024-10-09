@@ -222,3 +222,23 @@ cp-R:
 
 build:
 	${MAKE} -C docker
+
+CODE_CPANM=$(shell type cpm >/dev/null 2>&1 && echo "cpm install" || echo "cpanm --installdeps .")
+CODE_WORKSPACES_DIR=$(abspath ${MAKEFILE_DIR}/..)
+
+code-generate-workspace:
+	echo '{"folders":[' > ${CODE_WORKSPACES_DIR}/mt.code-workspace
+	for d in `ls ..`; do \
+		printf '%s%s%s' '{"path":"' $$d '"},' >> ${CODE_WORKSPACES_DIR}/mt.code-workspace; \
+	done
+	echo '],"settings":{"perlnavigator.includePaths":["${MAKEFILE_DIR}/.perl-local/lib/perl5",' >> ${CODE_WORKSPACES_DIR}/mt.code-workspace
+	for d in `find .. -maxdepth 4 -type d -name 'lib' -or -name 'extlib' | sed -e 's/^..//'`; do \
+		printf '%s%s%s' '"' ${CODE_WORKSPACES_DIR}/$$d '",' >> ${CODE_WORKSPACES_DIR}/mt.code-workspace; \
+	done
+	echo ']}' >> ${CODE_WORKSPACES_DIR}/mt.code-workspace
+
+code-cpanm-install:
+	cd `ls -d ../*movabletype/t | head -n 1` && ${CODE_CPANM} -L${MAKEFILE_DIR}/.perl-local || true
+
+code-open-workspace: code-cpanm-install code-generate-workspace
+	code ../mt.code-workspace
