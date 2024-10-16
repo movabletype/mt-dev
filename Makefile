@@ -222,3 +222,36 @@ cp-R:
 
 build:
 	${MAKE} -C docker
+
+CODE_CPANM=$(shell type cpm >/dev/null 2>&1 && echo "cpm install" || echo "cpanm --installdeps .")
+CODE_WORKSPACES_DIR=$(abspath ${MAKEFILE_DIR}/..)
+CODE_DIR=${MAKEFILE_DIR}/.code
+CODE_CODE_WORKSPACE_FILE=${CODE_DIR}/mt.code-workspace
+
+code-init:
+	mkdir -p ${CODE_DIR}
+
+LIBS=$(shell \
+	find .. -maxdepth 4 -type d \
+		\( -name 'lib' -o -name 'extlib' \) \
+		-not -path '*/node_modules/*' \
+		-not -path '*/bower_components/*' \
+		-not -path '*/local/*' \
+		-not -path '*/.*/*' \
+	| sed -e 's/^..\///' | grep -v 'movabletype-patches')
+code-generate-workspace: code-init
+	echo '{"folders":[' > ${CODE_CODE_WORKSPACE_FILE}
+	for d in `echo ${LIBS} | perl -pe 's/\/\S+//g; s/ /\\n/g' | sort -u`; do \
+		printf '%s%s%s' '{"path":"' ${CODE_WORKSPACES_DIR}/$$d '"},' >> ${CODE_CODE_WORKSPACE_FILE}; \
+	done
+	echo '],"settings":{"perlnavigator.includePaths":["${CODE_DIR}/local/lib/perl5",' >> ${CODE_CODE_WORKSPACE_FILE}
+	for d in ${LIBS}; do \
+		printf '%s%s%s' '"' ${CODE_WORKSPACES_DIR}/$$d '",' >> ${CODE_CODE_WORKSPACE_FILE}; \
+	done
+	echo ']}' >> ${CODE_CODE_WORKSPACE_FILE}
+
+code-cpanm-install: code-init
+	cd `ls -d ../*movabletype/t | head -n 1` && ${CODE_CPANM} -L${CODE_DIR}/local || true
+
+code-open-workspace: code-cpanm-install code-generate-workspace
+	code ${CODE_CODE_WORKSPACE_FILE}
