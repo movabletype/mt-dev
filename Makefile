@@ -42,6 +42,7 @@ export DOCKER_HTTPD_BUILD_CONTEXT
 export DOCKER_HTTPD_DOCKERFILE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
+export DOCKER_MYSQL_COMMAND
 export DOCKER_MEMCACHED_IMAGE
 export DOCKER_LDAP_IMAGE
 export DOCKER_FTPD_IMAGE
@@ -94,7 +95,9 @@ fixup:
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
-
+ifeq (${DOCKER_MYSQL_COMMAND},)
+	$(eval export DOCKER_MYSQL_COMMAND=$(shell if echo ${DOCKER_MYSQL_IMAGE} | egrep -q '^mysql:(9|[1-9][0-9]+)$$'; then echo ''; else echo '--default-authentication-plugin=mysql_native_password'; fi))
+endif
 
 ifneq (${SQL},)
 MYSQL_COMMAND_ARGS=-e '${SQL}'
