@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+* Added support for mysql:9.x docker images.
+* Enable to use SSL connection to MySQL.
+
 ### Changed
 
 * Update default image version.
