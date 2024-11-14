@@ -42,6 +42,7 @@ export DOCKER_HTTPD_BUILD_CONTEXT
 export DOCKER_HTTPD_DOCKERFILE
 export DOCKER_HTTPD_IMAGE
 export DOCKER_MYSQL_IMAGE
+export DOCKER_MYSQL_COMMAND
 export DOCKER_MEMCACHED_IMAGE
 export DOCKER_LDAP_IMAGE
 export DOCKER_FTPD_IMAGE
@@ -94,15 +95,20 @@ fixup:
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
-
+ifeq (${DOCKER_MYSQL_COMMAND},)
+	$(eval export DOCKER_MYSQL_COMMAND=$(shell if echo ${DOCKER_MYSQL_IMAGE} | egrep -q '^mysql:(9|[1-9][0-9]+)$$'; then echo ''; else echo '--default-authentication-plugin=mysql_native_password'; fi))
+endif
 
 ifneq (${SQL},)
 MYSQL_COMMAND_ARGS=-e '${SQL}'
 endif
 
+update-ssl:
+	${DOCKER} run --rm -v ${MAKEFILE_DIR}/ssl:/ssl -w /ssl --entrypoint /bin/sh alpine/openssl:latest generate-certs.sh
+
 exec-mysql:
 	opt=""; if ! [ -t 0 ] ; then opt="-T" ; fi; \
-		${_DC} exec $$opt db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_ARGS}
+		${_DC} exec $$opt db mysql -uroot -ppassword -hlocalhost ${MYSQL_COMMAND_ARGS}
 
 # FIXME:
 exec-ldappasswd:
@@ -122,7 +128,7 @@ else
 ARCHIVE_FOR_SETUP=${ARCHIVE}
 endif
 
-up-common: down fixup
+up-common: down fixup update-ssl
 	${MAKE} down-mt-home-volume
 	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 
