@@ -1,0 +1,9 @@
+[mysqld]
+ssl-ca=/mt-dev/ssl/certs/ca-cert.pem
+ssl-cert=/mt-dev/ssl/certs/server-cert.pem
+ssl-key=/mt-dev/ssl/certs/server-key.pem
+
+[client]
+ssl-ca=/mt-dev/ssl/certs/ca-cert.pem
+ssl-cert=/mt-dev/ssl/certs/client-cert.pem
+ssl-key=/mt-dev/ssl/certs/client-key.pem

@@ -103,9 +103,12 @@ ifneq (${SQL},)
 MYSQL_COMMAND_ARGS=-e '${SQL}'
 endif
 
+update-ssl:
+	${DOCKER} run --rm -v ${MAKEFILE_DIR}/ssl:/ssl -w /ssl --entrypoint /bin/sh alpine/openssl:latest generate-certs.sh
+
 exec-mysql:
 	opt=""; if ! [ -t 0 ] ; then opt="-T" ; fi; \
-		${_DC} exec $$opt db mysql -uroot -ppassword -h127.0.0.1 ${MYSQL_COMMAND_ARGS}
+		${_DC} exec $$opt db mysql -uroot -ppassword -hlocalhost ${MYSQL_COMMAND_ARGS}
 
 # FIXME:
 exec-ldappasswd:
@@ -125,7 +128,7 @@ else
 ARCHIVE_FOR_SETUP=${ARCHIVE}
 endif
 
-up-common: down fixup
+up-common: down fixup update-ssl
 	${MAKE} down-mt-home-volume
 	${DOCKER} volume create --label mt-dev-mt-home-tmp mt-dev-mt-home-tmp
 

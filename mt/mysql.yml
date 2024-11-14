@@ -5,7 +5,8 @@ services:
       MYSQL_ROOT_PASSWORD: password
     command: ${DOCKER_MYSQL_COMMAND}
     volumes:
-      - "../mysql:/mt-dev/mysql"
+      - "..:/mt-dev"
+      - "./mysql/conf.d:/etc/mysql/conf.d"
       - "${DOCKER_MYSQL_VOLUME:-mysql8}:/var/lib/mysql"
 volumes:
   mariadb10:
