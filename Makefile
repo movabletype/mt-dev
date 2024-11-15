@@ -95,9 +95,7 @@ fixup:
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
-ifeq (${DOCKER_MYSQL_COMMAND},)
-	$(eval export DOCKER_MYSQL_COMMAND=$(shell if echo ${DOCKER_MYSQL_IMAGE} | egrep -q '^mysql:(9|[1-9][0-9]+)$$'; then echo ''; else echo '--default-authentication-plugin=mysql_native_password'; fi))
-endif
+	$(eval export DOCKER_MYSQL_COMMAND_AUTH_PLUGIN=$(shell if ! echo ${DOCKER_MYSQL_IMAGE} | egrep -q '^mysql:(9|[1-9][0-9]+)$$'; then echo '--default-authentication-plugin=mysql_native_password'; fi))
 
 ifneq (${SQL},)
 MYSQL_COMMAND_ARGS=-e '${SQL}'
