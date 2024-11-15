@@ -43,3 +43,9 @@ BaseSitePath /var/www/html
 PIDFilePath /tmp/mt.psgi.pid
 
 MemcachedServers memcached:11211
+
+DBIConnectOptions mysql_ssl=1
+DBIConnectOptions mysql_ssl_verify_server_cert=1
+DBIConnectOptions mysql_ssl_client_key=/mt-dev/ssl/certs/client-key.pem
+DBIConnectOptions mysql_ssl_client_cert=/mt-dev/ssl/certs/client-cert.pem
+DBIConnectOptions mysql_ssl_ca_file=/mt-dev/ssl/certs/ca-cert.pem
