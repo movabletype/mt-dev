@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_MYSQL_IMAGE:-mysql:8.0.32}
     environment:
       MYSQL_ROOT_PASSWORD: password
-    command: ${DOCKER_MYSQL_COMMAND} ${DOCKER_MYSQL_COMMAND_AUTH_PLUGIN}
+    command: ${DOCKER_MYSQL_COMMAND} ${DOCKER_MYSQL_COMMAND_AUTH_PLUGIN:-}
     volumes:
       - "..:/mt-dev"
       - "./mysql/conf.d:/etc/mysql/conf.d"
