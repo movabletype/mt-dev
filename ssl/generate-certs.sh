@@ -21,3 +21,5 @@ openssl req -new -key certs/client-key.pem -out certs/client-req.pem \
 openssl x509 -req -in certs/client-req.pem -days 3650 \
     -CA certs/ca-cert.pem -CAkey certs/ca-key.pem -CAcreateserial \
     -out certs/client-cert.pem
+
+chmod 644 certs/*
