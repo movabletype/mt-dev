@@ -36,7 +36,10 @@ $ vagrant mt-dev up ARCHIVE=MT7-R0000.zip
 $ vagrant mt-dev exec-mysql SQL='CREATE DATABASE mt /*!40100 DEFAULT CHARACTER SET utf8mb4 */'
 ```
 
-Open http://192.168.58.25/cgi-bin/mt/mt.cgi .
+Open mt.cgi in your web browser. Typical URLs for each environment are as follows
+* Vagrant: http://192.168.58.25/cgi-bin/mt/mt.cgi
+* Docker: http://localhost/cgi-bin/mt/mt.cgi
+    * You can change the port to expose by adding `HTTPD_EXPOSE_PORT=${PORT_NUMBER}` to the `make up` argument.
 
 mt-config.cgi will use mt-dev/mt-config.cgi (or mt-config.cgi-original if none).
 
