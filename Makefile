@@ -151,7 +151,11 @@ ifneq (${PR},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" PR="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
-	@echo "Server is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}/cgi-bin/mt/mt.cgi"
+	@if [ -t 1 ] && which tput >/dev/null 2>&1 && [ $$(tput colors 2>/dev/null || echo 0) -ge 8 ]; then \
+		echo "\n\033[32m➜\033[0m Movable Type is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}/cgi-bin/mt/mt.cgi"; \
+	else \
+		echo "\n➜ Movable Type is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}/cgi-bin/mt/mt.cgi"; \
+	fi
 
 up-common-invoke-docker-compose: _DC_YAML_OVERRIDE=-f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE}
 up-common-invoke-docker-compose: setup-mysql-volume
