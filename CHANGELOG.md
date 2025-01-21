@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Make the generated certificate readable by any MySQL server.
 
+### Fixed
+
+* Fix permission issue of mysql conf.d directory.
+  * Remove write permission because it is an error in environments where write permission is added to other by default.
+
 ## [2.7.0] - 2024-11-15
 
 ### Added

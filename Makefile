@@ -92,6 +92,7 @@ fixup:
 			[ -d $$fp ] && rmdir $$fp || true; \
 			[ -f $$fp ] && perl -e 'exit((stat(shift))[7] == 0 ? 0 : 1)' $$fp && rm -f $$fp || true; \
 		done
+	@chmod -R go-w mt/mysql/conf.d
 
 setup-mysql-volume:
 	$(eval export DOCKER_MYSQL_VOLUME=$(shell echo ${DOCKER_MYSQL_IMAGE} | sed -e 's/\..*//; s/[^a-zA-Z0-9]//g'))
