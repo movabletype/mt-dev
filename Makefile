@@ -7,6 +7,7 @@ export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export HTTPD_HOST_NAME:=localhost
+export HTTPD_EXPOSE_PORT:=80
 export UPDATE_BRANCH:=yes
 export UPDATE_DOCKER_IMAGE:=yes
 export CREATE_DATABASE_IF_NOT_EXISTS:=yes
@@ -50,7 +51,6 @@ export DOCKER_FTPD_IMAGE
 export DOCKER_MAILPIT_IMAGE
 export DOCKER_VOLUME_MOUNT_FLAG
 export MT_RUN_VIA
-export HTTPD_EXPOSE_PORT
 export MT_EXPOSE_PORT
 export MAILPIT_EXPOSE_PORT
 export PLACKUP
@@ -151,7 +151,7 @@ ifneq (${PR},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" PR="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
-	@echo "Server is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT:-80}"
+	@echo "Server is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}"
 
 up-common-invoke-docker-compose: _DC_YAML_OVERRIDE=-f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE}
 up-common-invoke-docker-compose: setup-mysql-volume
