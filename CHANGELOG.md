@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Make the generated certificate readable by any MySQL server.
+* Print the URL of the running server.
 
 ### Fixed
 

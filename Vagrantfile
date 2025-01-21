@@ -2,6 +2,8 @@
 # vi: set ft=ruby :
 
 class MtDevCommand < Vagrant.plugin(2, :command)
+  vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
+
   def error(status)
     print "\e[31m"
     puts "Got error"
@@ -100,7 +102,7 @@ https://github.com/movabletype/mt-dev/wiki/Troubleshooting
       return
     else
       argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
-      commands.push("cd /home/vagrant/mt-dev && make " + argv)
+      commands.push("cd /home/vagrant/mt-dev && make HTTPD_HOST_NAME=#{vm_private_network_ip} " + argv)
     end
 
     with_target_vms(nil, single_target: true) do |vm|
@@ -135,8 +137,6 @@ class MtDev < Vagrant.plugin("2")
     MtDevCommand
   end
 end
-
-vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
 
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-24.04"
