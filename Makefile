@@ -151,7 +151,7 @@ ifneq (${PR},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
 	${MAKE} up-common-invoke-docker-compose MT_HOME_PATH=${MT_HOME_PATH} ${_ARGS} RECIPE="" REPO="" PR="" $(shell [ -n "${DOCKER_MT_IMAGE}" ] && echo "DOCKER_MT_IMAGE=${DOCKER_MT_IMAGE}") $(shell [ -n "${DOCKER_MYSQL_IMAGE}" ] && echo "DOCKER_MYSQL_IMAGE=${DOCKER_MYSQL_IMAGE}")
-	@echo "Server is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}"
+	@echo "Server is running on http://${HTTPD_HOST_NAME}:${HTTPD_EXPOSE_PORT}/cgi-bin/mt/mt.cgi"
 
 up-common-invoke-docker-compose: _DC_YAML_OVERRIDE=-f ./mt/${MT_RUN_VIA}.yml ${DOCKER_COMPOSE_YAML_OVERRIDE}
 up-common-invoke-docker-compose: setup-mysql-volume
