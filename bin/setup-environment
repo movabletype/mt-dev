@@ -194,7 +194,7 @@ sub handle_recipe {
         my $links = $data->{$k}{links};
         if ( !$links ) {
             $links = [
-                map { $_ =~ s{\A$plugin_dir/}{}; $_ } (
+                map { $_ =~ s{\A\Q$plugin_dir\E/}{}; $_ } (
                     glob("$plugin_dir/*.cgi"),
                     glob("$plugin_dir/plugins/*"),
                     glob("$plugin_dir/mt-static/plugins/*"),
