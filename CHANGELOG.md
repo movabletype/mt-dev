@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix permission issue of mysql conf.d directory.
   * Remove write permission because it is an error in environments where write permission is added to other by default.
+* Fix the path mapping of plugins.
+  * Fixed a problem in which the path of a plugin is misaligned if it contains regular expression meta characters such as "+".
 
 ## [2.7.0] - 2024-11-15
 
