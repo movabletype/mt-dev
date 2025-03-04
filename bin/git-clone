@@ -1,4 +1,5 @@
-#!/bin/bash -xe
+#!/usr/bin/env bash
+set -xe
 set -o pipefail
 
 repo=$1
