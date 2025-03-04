@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
 rm -fr /tmp/mt-dev-archive-temp-* || \
     echo "Failed to remove temporary directory:" /tmp/mt-dev-archive-temp-*
