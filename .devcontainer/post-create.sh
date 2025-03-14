@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xe
+set -x
 
 sudo apt update
 sudo apt install -y make git zip cpanminus perltidy libio-socket-ssl-perl
