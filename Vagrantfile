@@ -1,9 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-class MtDevCommand < Vagrant.plugin(2, :command)
-  vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
+$mt_dev_vm_private_network_ip = ENV["VM_PRIVATE_NETWORK_IP"] || "192.168.58.25"
 
+class MtDevCommand < Vagrant.plugin(2, :command)
   def error(status)
     print "\e[31m"
     puts "Got error"
@@ -102,7 +102,7 @@ https://github.com/movabletype/mt-dev/wiki/Troubleshooting
       return
     else
       argv = @argv.map { |str| Shellwords.shellescape(str) }.join(" ")
-      commands.push("cd /home/vagrant/mt-dev && make HTTPD_HOST_NAME=#{vm_private_network_ip} " + argv)
+      commands.push("cd /home/vagrant/mt-dev && make HTTPD_HOST_NAME=#{$mt_dev_vm_private_network_ip} " + argv)
     end
 
     with_target_vms(nil, single_target: true) do |vm|
@@ -140,7 +140,7 @@ end
 
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-24.04"
-  config.vm.network "private_network", ip: vm_private_network_ip
+  config.vm.network "private_network", ip: $mt_dev_vm_private_network_ip
   config.vm.hostname = "mt-dev"
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
