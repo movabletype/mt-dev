@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Print the URL of the running server.
 * Use "/usr/bin/env bash" instead of "/bin/bash" in the shell script.
 * Execute post-create.sh as much as possible for codespaces
+* Stop setup-environment script when pr option is not used
 
 ### Fixed
 
