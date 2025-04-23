@@ -42,6 +42,7 @@ my $workspace = {
     folders  => [],
     settings => {},
 };
+my $pr_is_used;
 
 sub _check_integrity {
     my ($integrity, $file_or_content) = @_;
@@ -135,7 +136,10 @@ sub handle_recipe {
             for my $pr ( split /\s+/, $pull_reqs ) {
                 my ( $pr_repo, $pr_id ) = ( $pr =~ m{([^/]+)/(pull/\d+)} );
                 next unless $pr_repo && $pr_id;
-                $branch = $pr_id . '/head' if $basename eq $pr_repo;
+                if ($basename eq $pr_repo) {
+                    $branch     = $pr_id . '/head';
+                    $pr_is_used = 1;
+                }
             }
 
             {
@@ -370,6 +374,10 @@ for my $a ( split /\s+/, $archives ) {
 
     $basename =~ s{\.}{_}g;    # "." causes problems in yaml files
     handle_recipe( { $basename => { directory => $directory, }, } );
+}
+
+if ($pull_reqs && !$pr_is_used) {
+    die "specified pr option is not used: ${pull_reqs}";
 }
 
 {
