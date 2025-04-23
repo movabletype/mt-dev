@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2025-04-23
+
 ### Changed
 
 * Make the generated certificate readable by any MySQL server.
@@ -13,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Use "/usr/bin/env bash" instead of "/bin/bash" in the shell script.
 * Execute post-create.sh as much as possible for codespaces
 * Stop setup-environment script when pr option is not used
+* Persistent mailpit database.
 
 ### Fixed
 
