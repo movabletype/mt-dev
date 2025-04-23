@@ -4,3 +4,11 @@ services:
     restart: always
     ports:
       - "${MAILPIT_EXPOSE_PORT:-8025}:8025"
+    environment:
+      - MP_DATABASE=/data/mailpit.db
+    volumes:
+      - mp_database:/data
+
+volumes:
+  mp_database:
+    driver: local
