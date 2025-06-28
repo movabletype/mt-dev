@@ -332,11 +332,43 @@ for my $a ( split /\s+/, $archives ) {
 
         # download
         my $response = HTTP::Tiny->new->get($a);
-        die "Failed: @{[Dumper($response)]}"
-            unless $response->{success} && length $response->{content};
 
-        ( my $fh, $file_path ) = tempfile( undef, SUFFIX => $ext );
-        print $fh $response->{content};
+        if (
+            $response->{status} == 404
+            && system('gh auth status > /dev/null 2>&1') == 0
+            && $a =~ m{^https://github.com/([^/]+/[^/]+)/actions/runs/[0-9]+/artifacts/([0-9]+)$}
+        ) {
+            my $repo = $1;
+            my $artifact_id = $2;
+
+            my $cwd     = getcwd();
+            my $tmp_dir = tempdir( '/tmp/mt-dev-archive-temp-XXXXX', );
+
+            chdir $tmp_dir;
+
+            my $cmd = "gh api repos/$repo/actions/artifacts/$artifact_id/zip > archive.zip";
+            my $res = `$cmd 2>&1` || "";
+            die "$res\nGot an error: $cmd" if $?;
+
+            $cmd = "unzip -q archive.zip";
+            $res = `$cmd 2>&1` || "";
+            die "$res\nGot an error: $cmd" if $?;
+
+            unlink 'archive.zip';
+            my ($filename) = `ls`;
+            chomp $filename;
+
+            chdir $cwd;
+
+            $file_path = catfile( $tmp_dir, $filename );
+        }
+        elsif ( !$response->{success} || !$response->{content} ) {
+            die "Failed: @{[Dumper($response)]}";
+        }
+        else {
+            ( my $fh, $file_path ) = tempfile( undef, SUFFIX => $ext );
+            print $fh $response->{content};
+        }
     }
     elsif ( $a =~ m{^/} ) {
         $file_path = $a;
