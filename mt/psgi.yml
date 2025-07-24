@@ -4,6 +4,7 @@ services:
     command: "${PLACKUP:-/usr/local/lib/mt/bin/plackup-mt} /var/www/cgi-bin/mt/mt.psgi"
     environment:
       MT_PID_FILE_PATH: ${MT_PID_FILE_PATH:-/tmp/mt.psgi.pid}
+      MT_UID: $MT_UID
     volumes:
       - "./plackup-mt:/usr/local/lib/mt/bin/plackup-mt"
 
