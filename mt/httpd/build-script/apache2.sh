@@ -65,6 +65,6 @@ mod_env_so=`find $module_dirs -name 'mod_env.so' 2>/dev/null | head -1`
 if [ -n "$mod_env_so" ]; then
     cat > $httpd_conf_d/mt-env.conf <<CONF
 LoadModule env_module $mod_env_so
-PassEnv NLS_LANG
+PassEnv NLS_LANG MT_CONFIG MT_HOME
 CONF
 fi
