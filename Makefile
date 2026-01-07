@@ -9,6 +9,7 @@ export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export HTTPD_HOST_NAME:=localhost
 export HTTPD_EXPOSE_PORT:=80
 export UPDATE_BRANCH:=yes
+export BIND_MOUNT_DIRECTORIES_ONLY:=no
 export UPDATE_DOCKER_IMAGE:=yes
 export CREATE_DATABASE_IF_NOT_EXISTS:=yes
 export DOCKER_MT_CPANFILES:=t/cpanfile
@@ -120,6 +121,7 @@ up-cgi: MT_RUN_VIA=cgi
 up-cgi: up-common
 
 up-psgi: MT_RUN_VIA=psgi
+up-psgi: BIND_MOUNT_DIRECTORIES_ONLY:=yes
 up-psgi: up-common
 
 
@@ -141,7 +143,7 @@ ifeq (${RECIPE},)
 endif
 endif
 
-	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --repo "$(shell echo ${REPO} | tr ',' ' ')" --pr "$(shell echo ${PR} | tr ',' ' ')" --archive "$(shell echo ${ARCHIVE_FOR_SETUP} | tr ',' ' ')"))
+	$(eval export _ARGS=$(shell UPDATE_BRANCH=${UPDATE_BRANCH} BIND_MOUNT_DIRECTORIES_ONLY=${BIND_MOUNT_DIRECTORIES_ONLY} ${MAKEFILE_DIR}/bin/setup-environment --recipe "$(shell echo ${RECIPE} | tr ',' ' ')" --repo "$(shell echo ${REPO} | tr ',' ' ')" --pr "$(shell echo ${PR} | tr ',' ' ')" --archive "$(shell echo ${ARCHIVE_FOR_SETUP} | tr ',' ' ')"))
 ifneq (${RECIPE},)
 	@perl -e 'exit(length($$ENV{_ARGS}) > 0 ? 0 : 1)'
 endif
