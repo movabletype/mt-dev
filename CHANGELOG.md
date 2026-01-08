@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * If the given URL is http://github.com/... and returns 404, then try to download the archive with the `gh` command and try to download the archive at http://github.com/...
 * Allow starman's --user option to be specified in the MT_UID environment variable.
+* Changed to not bind mount files whenever possible. This is because bind mounting files on Docker Desktop on Mac causes an error.
 
 ### Changed
 
