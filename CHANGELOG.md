@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-01-09
+
 ### Added
 
 * If the given URL is http://github.com/... and returns 404, then try to download the archive with the `gh` command and try to download the archive at http://github.com/...
