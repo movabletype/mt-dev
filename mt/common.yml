@@ -58,6 +58,8 @@ services:
   mt-watcher:
     build:
       context: mt-watcher
+      args:
+        - DOCKER_VERSION=${DOCKER_VERSION:-29.1.3}
     working_dir: /var/www/cgi-bin/mt
     environment:
       PERL_FNS_NO_OPT: ${PERL_FNS_NO_OPT:-0}
