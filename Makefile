@@ -33,6 +33,7 @@ ifneq (${MT_EXPOSE_PORT},)
 export DOCKER_COMPOSE_YAML_EXPOSE=-f ./mt/mt-expose.yml
 endif
 
+export DOCKER_VERSION
 export DOCKER_COMPOSE_USER_YAML
 export DOCKER_MT_BUILD_CONTEXT
 export DOCKER_MT_DOCKERFILE
