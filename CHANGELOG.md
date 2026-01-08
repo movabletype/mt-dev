@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * If the given URL is http://github.com/... and returns 404, then try to download the archive with the `gh` command and try to download the archive at http://github.com/...
 * Allow starman's --user option to be specified in the MT_UID environment variable.
 
+### Changed
+
+* Update default docker version of mt-watcher to 29.1.3.
+
+The DOCKER_VERSION environment variable can be used to override the default version.
+```
+$ make up-psgi DOCKER_VERSION=28.5.2 # If you want to use an older specific version
+```
+
 ## [2.8.0] - 2025-04-23
 
 ### Changed

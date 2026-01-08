@@ -1,6 +1,6 @@
-FROM perl:5.36-slim
+FROM perl:5.42-slim
 
-ARG DOCKER_VERSION=20.10.9
+ARG DOCKER_VERSION
 
 RUN set -ex \
     \
