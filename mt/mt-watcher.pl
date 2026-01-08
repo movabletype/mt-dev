@@ -31,8 +31,8 @@ while (1) {
             return unless @paths;
 
             print( join( "\n", @paths ) . "\n" );
-            my $mt_container_id = `docker ps -q --filter label=mt-dev.service=mt`;
-            system("docker kill -s HUP $mt_container_id");
+            my $mt_container_id = `DOCKER_API_VERSION=1.44 docker ps -q --filter label=mt-dev.service=mt`;
+            system("DOCKER_API_VERSION=1.44 docker kill -s HUP $mt_container_id");
 
             # throttling
             sleep(1);
