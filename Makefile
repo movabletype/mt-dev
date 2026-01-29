@@ -224,11 +224,11 @@ endif
 
 cpan-install:
 	${_DC} exec mt cpm install -g ${ARGS}
-	${_DC} exec mt kill 1
+	${_DC} exec mt kill -HUP 1
 
 cpan-uninstall:
 	${_DC} exec mt bash -c "cpm install -g App::cpanminus && cpanm -fU ${ARGS}"
-	${_DC} exec mt kill 1
+	${_DC} exec mt kill -HUP 1
 
 cp-R:
 	mkdir -p ${TO}
