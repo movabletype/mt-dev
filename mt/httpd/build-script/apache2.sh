@@ -17,6 +17,17 @@ Alias /mt-static/ /var/www/cgi-bin/mt/mt-static/
 # Workaround to run amd64 image on arm64
 Mutex posixsem
 CONF
+for d in /var/www/html/cgi-bin/mt /var/www/cgi-bin/mt; do
+    cat >> $httpd_conf_d/mt.conf <<CONF
+<Directory $d>
+Options +SymLinksIfOwnerMatch
+
+RewriteEngine on
+RewriteRule ^mt-static - [L]
+RewriteRule (.*) http://mt/cgi-bin/mt/\$1 [P,L]
+</Directory>
+CONF
+done
 
 mod_rewrite_so=`find $module_dirs -name 'mod_rewrite.so' 2>/dev/null | head -1`
 if [ -n "$mod_rewrite_so" ]; then
@@ -65,6 +76,6 @@ mod_env_so=`find $module_dirs -name 'mod_env.so' 2>/dev/null | head -1`
 if [ -n "$mod_env_so" ]; then
     cat > $httpd_conf_d/mt-env.conf <<CONF
 LoadModule env_module $mod_env_so
-PassEnv NLS_LANG
+PassEnv NLS_LANG MT_CONFIG MT_HOME
 CONF
 fi

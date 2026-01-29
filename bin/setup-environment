@@ -211,6 +211,9 @@ sub handle_recipe {
         }
 
         for my $l (@$links) {
+            next
+              if $ENV{BIND_MOUNT_DIRECTORIES_ONLY} eq 'yes'
+              && !-d "$plugin_dir/$l";
             push @volumes,
                 "      - '$plugin_dir/$l:/var/www/cgi-bin/mt/$l:\${DOCKER_VOLUME_MOUNT_FLAG:-rw}'";
         }
