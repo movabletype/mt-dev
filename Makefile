@@ -76,7 +76,7 @@ ENV_FILE=.env
 
 # setup internal variables
 
-MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
+MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{^/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
 export MT_CONFIG_CGI_SRC_PATH
 
 ifneq (${WITHOUT_MT_CONFIG_CGI},)
@@ -95,13 +95,13 @@ endif
 ifneq (${EDGE_CERT_FILE},)
 ifneq (${EDGE_KEY_FILE},)
 export DOCKER_COMPOSE_YAML_EDGE=-f ./mt/edge.yml
-export EDGE_CERT_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_CERT_FILE}" =~ m{/} ? "${EDGE_CERT_FILE}" : "${MAKEFILE_DIR}/${EDGE_CERT_FILE}")' }
-export EDGE_KEY_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_KEY_FILE}" =~ m{/} ? "${EDGE_KEY_FILE}" : "${MAKEFILE_DIR}/${EDGE_KEY_FILE}")' }
+export EDGE_CERT_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_CERT_FILE}" =~ m{^/} ? "${EDGE_CERT_FILE}" : "${MAKEFILE_DIR}/${EDGE_CERT_FILE}")' }
+export EDGE_KEY_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_KEY_FILE}" =~ m{^/} ? "${EDGE_KEY_FILE}" : "${MAKEFILE_DIR}/${EDGE_KEY_FILE}")' }
 endif
 endif
 
 ifneq (${EDGE_AUTH_USER_FILE},)
-export EDGE_AUTH_USER_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_AUTH_USER_FILE}" =~ m{/} ? "${EDGE_AUTH_USER_FILE}" : "${MAKEFILE_DIR}/${EDGE_AUTH_USER_FILE}")' }
+export EDGE_AUTH_USER_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_AUTH_USER_FILE}" =~ m{^/} ? "${EDGE_AUTH_USER_FILE}" : "${MAKEFILE_DIR}/${EDGE_AUTH_USER_FILE}")' }
 export EDGE_AUTH_USER_CONF_DEST_PATH=/etc/nginx/server-conf.d/auth-user.conf
 endif
 
