@@ -1,8 +1,10 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-export BASE_SITE_PATH:=${MAKEFILE_DIR}/site
 export DOCKER:=docker
 export DOCKER_COMPOSE:=${shell ${DOCKER} compose >/dev/null 2>&1 && echo 'docker compose' || echo 'docker-compose'}
+AWS_CLI:=docker run --rm amazon/aws-cli
+
+export BASE_SITE_PATH:=${MAKEFILE_DIR}/site
 export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
@@ -57,6 +59,7 @@ export MT_UID
 export MAILPIT_EXPOSE_PORT
 export PLACKUP
 export CMD
+export EDGE_FQDN
 
 # mt-watcher container
 export DISABLE_MT_WATCHER
@@ -268,3 +271,48 @@ code-cpanm-install: code-init
 
 code-open-workspace: code-cpanm-install code-generate-workspace
 	code ${CODE_CODE_WORKSPACE_FILE}
+
+# utilities
+update-site-dns:
+	@if [ -z "${EDGE_FQDN}" ]; then \
+		echo "EDGE_FQDN is not set. Skipping DNS update."; \
+		exit 0; \
+	fi;
+
+	@zone_name=$$(echo ${EDGE_FQDN} | perl -pe 's/^[^.]+\.//'); \
+		zone_id=$$(${AWS_CLI} route53 list-hosted-zones-by-name --dns-name $$zone_name --query 'HostedZones[0].Id' --output text); \
+		echo "EDGE_FQDN: ${EDGE_FQDN}"; \
+		echo "zone_id: $$zone_id"; \
+		printf "Are you sure you want to proceed? yes/no: "; \
+		read answer; \
+		if [ "$$answer" != "yes" ]; then \
+			echo "Canceled DNS update."; \
+			exit 0; \
+		fi; \
+		public_ip=$$(curl -s http://checkip.amazonaws.com | tr -d '\n'); \
+		change_batch=$$(printf '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"%s","Type":"A","TTL":300,"ResourceRecords":[{"Value":"%s"}]}}]}' "${EDGE_FQDN}" "$$public_ip"); \
+		change_id=$$(${AWS_CLI} route53 change-resource-record-sets --hosted-zone-id $$zone_id --change-batch "$$change_batch" --query 'ChangeInfo.Id' --output text); \
+		status=$$(${AWS_CLI} route53 get-change --id $$change_id --query 'ChangeInfo.Status' --output text); \
+		while [ "$$status" = "PENDING" ]; do \
+			echo "Route53 change is $$status: $$change_id"; \
+			sleep 5; \
+			status=$$(${AWS_CLI} route53 get-change --id $$change_id --query 'ChangeInfo.Status' --output text); \
+		done; \
+		echo "Route53 change status is $$status: $$change_id"
+
+update-site-certificate: down
+	@if [ -z "${LETSENCRYPT_EMAIL}" -o -z "${EDGE_FQDN}" ]; then \
+		echo "LETSENCRYPT_EMAIL or EDGE_FQDN is not set. Skipping certificate update."; \
+		exit 0; \
+	fi;
+
+	@cert_dir="${MAKEFILE_DIR}/ssl/certificates"; \
+	lego_cmd="docker run --rm -v ${MAKEFILE_DIR}/ssl:/etc/lego  -u `id -u`:`id -g` -p 80:80 xenolf/lego --path /etc/lego --accept-tos -m ${LETSENCRYPT_EMAIL} -d ${EDGE_FQDN} --http"; \
+	if [ -f "$$cert_dir/${EDGE_FQDN}.crt" ]; then \
+		$$lego_cmd renew --days 30; \
+	else \
+		$$lego_cmd run; \
+	fi; \
+	cp "$$cert_dir/${EDGE_FQDN}.key" "$$cert_dir/server.key"; \
+	cp "$$cert_dir/${EDGE_FQDN}.issuer.crt" "$$cert_dir/chain.crt"; \
+	cat "$$cert_dir/${EDGE_FQDN}.crt" "$$cert_dir/${EDGE_FQDN}.issuer.crt" > "$$cert_dir/server.crt"
