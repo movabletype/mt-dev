@@ -1,13 +1,16 @@
 MAKEFILE_DIR=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-export BASE_SITE_PATH:=${MAKEFILE_DIR}/site
 export DOCKER:=docker
 export DOCKER_COMPOSE:=${shell ${DOCKER} compose >/dev/null 2>&1 && echo 'docker compose' || echo 'docker-compose'}
+AWS_CLI:=docker run --rm amazon/aws-cli
+
+export BASE_SITE_PATH:=${MAKEFILE_DIR}/site
 export DOCKER_COMPOSE_YAML_MIDDLEWARES:=-f ./mt/mysql.yml -f ./mt/memcached.yml
 export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export HTTPD_HOST_NAME:=localhost
 export HTTPD_EXPOSE_PORT:=80
+export EDGE_EXPOSE_PORT:=443
 export UPDATE_BRANCH:=yes
 export UPDATE_DOCKER_IMAGE:=yes
 export CREATE_DATABASE_IF_NOT_EXISTS:=yes
@@ -44,6 +47,7 @@ export DOCKER_NODEJS_IMAGE
 export DOCKER_HTTPD_BUILD_CONTEXT
 export DOCKER_HTTPD_DOCKERFILE
 export DOCKER_HTTPD_IMAGE
+export DOCKER_EDGE_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MYSQL_COMMAND
 export DOCKER_MEMCACHED_IMAGE
@@ -57,6 +61,8 @@ export MT_UID
 export MAILPIT_EXPOSE_PORT
 export PLACKUP
 export CMD
+export EDGE_CERT_FILE
+export EDGE_KEY_FILE
 
 # mt-watcher container
 export DISABLE_MT_WATCHER
@@ -70,7 +76,7 @@ ENV_FILE=.env
 
 # setup internal variables
 
-MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
+MT_CONFIG_CGI_SRC_PATH=${shell perl -e 'print("${MT_CONFIG_CGI}" =~ m{^/} ? "${MT_CONFIG_CGI}" : "${MAKEFILE_DIR}/${MT_CONFIG_CGI}")' }
 export MT_CONFIG_CGI_SRC_PATH
 
 ifneq (${WITHOUT_MT_CONFIG_CGI},)
@@ -81,7 +87,25 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
+ifneq (${EDGE_FQDN},)
+EDGE_CERT_FILE=ssl/certificates/server.crt
+EDGE_KEY_FILE=ssl/certificates/server.key
+endif
+
+ifneq (${EDGE_CERT_FILE},)
+ifneq (${EDGE_KEY_FILE},)
+export DOCKER_COMPOSE_YAML_EDGE=-f ./mt/edge.yml
+export EDGE_CERT_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_CERT_FILE}" =~ m{^/} ? "${EDGE_CERT_FILE}" : "${MAKEFILE_DIR}/${EDGE_CERT_FILE}")' }
+export EDGE_KEY_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_KEY_FILE}" =~ m{^/} ? "${EDGE_KEY_FILE}" : "${MAKEFILE_DIR}/${EDGE_KEY_FILE}")' }
+endif
+endif
+
+ifneq (${EDGE_AUTH_USER_FILE},)
+export EDGE_AUTH_USER_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_AUTH_USER_FILE}" =~ m{^/} ? "${EDGE_AUTH_USER_FILE}" : "${MAKEFILE_DIR}/${EDGE_AUTH_USER_FILE}")' }
+export EDGE_AUTH_USER_CONF_DEST_PATH=/etc/nginx/server-conf.d/auth-user.conf
+endif
+
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${DOCKER_COMPOSE_YAML_EDGE} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
 _DATABASE=${shell perl -ne 'print $$1 if /^Database\s+([\w-]+)/' < ${MT_CONFIG_CGI_SRC_PATH}}
 
 .PHONY: db up down
@@ -268,3 +292,47 @@ code-cpanm-install: code-init
 
 code-open-workspace: code-cpanm-install code-generate-workspace
 	code ${CODE_CODE_WORKSPACE_FILE}
+
+# utilities
+update-site-dns:
+	@if [ -z "${EDGE_FQDN}" ]; then \
+		echo "EDGE_FQDN is not set. Skipping DNS update."; \
+		exit 0; \
+	fi;
+
+	@zone_name=$$(echo ${EDGE_FQDN} | perl -pe 's/^[^.]+\.//'); \
+		zone_id=$$(${AWS_CLI} route53 list-hosted-zones-by-name --dns-name $$zone_name --query 'HostedZones[0].Id' --output text); \
+		echo "EDGE_FQDN: ${EDGE_FQDN}"; \
+		echo "zone_id: $$zone_id"; \
+		printf "Are you sure you want to proceed? yes/no: "; \
+		read answer; \
+		if [ "$$answer" != "yes" ]; then \
+			echo "Canceled DNS update."; \
+			exit 0; \
+		fi; \
+		public_ip=$$(curl -s http://checkip.amazonaws.com | tr -d '\n'); \
+		change_batch=$$(printf '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"%s","Type":"A","TTL":300,"ResourceRecords":[{"Value":"%s"}]}}]}' "${EDGE_FQDN}" "$$public_ip"); \
+		change_id=$$(${AWS_CLI} route53 change-resource-record-sets --hosted-zone-id $$zone_id --change-batch "$$change_batch" --query 'ChangeInfo.Id' --output text); \
+		status=$$(${AWS_CLI} route53 get-change --id $$change_id --query 'ChangeInfo.Status' --output text); \
+		while [ "$$status" = "PENDING" ]; do \
+			echo "Route53 change is $$status: $$change_id"; \
+			sleep 5; \
+			status=$$(${AWS_CLI} route53 get-change --id $$change_id --query 'ChangeInfo.Status' --output text); \
+		done; \
+		echo "Route53 change status is $$status: $$change_id"
+
+update-site-certificate: down
+	@if [ -z "${LETSENCRYPT_EMAIL}" -o -z "${EDGE_FQDN}" ]; then \
+		echo "LETSENCRYPT_EMAIL or EDGE_FQDN is not set. Skipping certificate update."; \
+		exit 0; \
+	fi;
+
+	@cert_dir="${MAKEFILE_DIR}/ssl/certificates"; \
+	lego_cmd="docker run --rm -v ${MAKEFILE_DIR}/ssl:/etc/lego  -u `id -u`:`id -g` -p 80:80 xenolf/lego --path /etc/lego --accept-tos -m ${LETSENCRYPT_EMAIL} -d ${EDGE_FQDN} --http"; \
+	if [ -f "$$cert_dir/${EDGE_FQDN}.crt" ]; then \
+		$$lego_cmd renew --days 30; \
+	else \
+		$$lego_cmd run; \
+	fi; \
+	cp "$$cert_dir/${EDGE_FQDN}.key" "${EDGE_KEY_FILE_SRC_PATH}"; \
+	cat "$$cert_dir/${EDGE_FQDN}.crt" "$$cert_dir/${EDGE_FQDN}.issuer.crt" > "${EDGE_CERT_FILE_SRC_PATH}"
