@@ -10,6 +10,7 @@ export UP_ARGS:=-d
 export MT_HOME_PATH:=${MAKEFILE_DIR}/../movabletype
 export HTTPD_HOST_NAME:=localhost
 export HTTPD_EXPOSE_PORT:=80
+export EDGE_EXPOSE_PORT:=443
 export UPDATE_BRANCH:=yes
 export UPDATE_DOCKER_IMAGE:=yes
 export CREATE_DATABASE_IF_NOT_EXISTS:=yes
@@ -46,6 +47,7 @@ export DOCKER_NODEJS_IMAGE
 export DOCKER_HTTPD_BUILD_CONTEXT
 export DOCKER_HTTPD_DOCKERFILE
 export DOCKER_HTTPD_IMAGE
+export DOCKER_EDGE_IMAGE
 export DOCKER_MYSQL_IMAGE
 export DOCKER_MYSQL_COMMAND
 export DOCKER_MEMCACHED_IMAGE
@@ -59,7 +61,8 @@ export MT_UID
 export MAILPIT_EXPOSE_PORT
 export PLACKUP
 export CMD
-export EDGE_FQDN
+export EDGE_CERT_FILE
+export EDGE_KEY_FILE
 
 # mt-watcher container
 export DISABLE_MT_WATCHER
@@ -84,7 +87,20 @@ ifeq ($(wildcard ${MT_CONFIG_CGI_SRC_PATH}),)
 $(error You should create ${MT_CONFIG_CGI_SRC_PATH} first.)
 endif
 
-_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
+ifneq (${EDGE_FQDN},)
+EDGE_CERT_FILE=ssl/certificates/server.crt
+EDGE_KEY_FILE=ssl/certificates/server.key
+endif
+
+ifneq (${EDGE_CERT_FILE},)
+ifneq (${EDGE_KEY_FILE},)
+export DOCKER_COMPOSE_YAML_EDGE=-f ./mt/edge.yml
+export EDGE_CERT_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_CERT_FILE}" =~ m{/} ? "${EDGE_CERT_FILE}" : "${MAKEFILE_DIR}/${EDGE_CERT_FILE}")' }
+export EDGE_KEY_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_KEY_FILE}" =~ m{/} ? "${EDGE_KEY_FILE}" : "${MAKEFILE_DIR}/${EDGE_KEY_FILE}")' }
+endif
+endif
+
+_DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${DOCKER_COMPOSE_YAML_EDGE} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
 _DATABASE=${shell perl -ne 'print $$1 if /^Database\s+([\w-]+)/' < ${MT_CONFIG_CGI_SRC_PATH}}
 
 .PHONY: db up down
@@ -313,6 +329,5 @@ update-site-certificate: down
 	else \
 		$$lego_cmd run; \
 	fi; \
-	cp "$$cert_dir/${EDGE_FQDN}.key" "$$cert_dir/server.key"; \
-	cp "$$cert_dir/${EDGE_FQDN}.issuer.crt" "$$cert_dir/chain.crt"; \
-	cat "$$cert_dir/${EDGE_FQDN}.crt" "$$cert_dir/${EDGE_FQDN}.issuer.crt" > "$$cert_dir/server.crt"
+	cp "$$cert_dir/${EDGE_FQDN}.key" "${EDGE_KEY_FILE_SRC_PATH}"; \
+	cat "$$cert_dir/${EDGE_FQDN}.crt" "$$cert_dir/${EDGE_FQDN}.issuer.crt" > "${EDGE_CERT_FILE_SRC_PATH}"
