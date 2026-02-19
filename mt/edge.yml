@@ -9,3 +9,5 @@ services:
       - "./edge/default.conf:/etc/nginx/conf.d/default.conf:ro"
       - "${EDGE_CERT_FILE_SRC_PATH}:/etc/nginx/certificates/server.crt:ro"
       - "${EDGE_KEY_FILE_SRC_PATH}:/etc/nginx/certificates/server.key:ro"
+      - "${EDGE_AUTH_USER_FILE_SRC_PATH:-/dev/null}:/etc/nginx/.htpasswd:ro"
+      - "./edge/auth-user.conf:${EDGE_AUTH_USER_CONF_DEST_PATH:-/tmp/no-edge-auth}:ro"

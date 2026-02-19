@@ -100,6 +100,11 @@ export EDGE_KEY_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_KEY_FILE}" =~ m{/} 
 endif
 endif
 
+ifneq (${EDGE_AUTH_USER_FILE},)
+export EDGE_AUTH_USER_FILE_SRC_PATH=${shell perl -e 'print("${EDGE_AUTH_USER_FILE}" =~ m{/} ? "${EDGE_AUTH_USER_FILE}" : "${MAKEFILE_DIR}/${EDGE_AUTH_USER_FILE}")' }
+export EDGE_AUTH_USER_CONF_DEST_PATH=/etc/nginx/server-conf.d/auth-user.conf
+endif
+
 _DC=${DOCKER_COMPOSE} -f ./mt/common.yml ${DOCKER_COMPOSE_YAML_MIDDLEWARES} ${DOCKER_COMPOSE_YAML_EDGE} ${_DC_YAML_OVERRIDE} ${DOCKER_COMPOSE_YAML_EXPOSE} ${DOCKER_COMPOSE_USER_YAML}
 _DATABASE=${shell perl -ne 'print $$1 if /^Database\s+([\w-]+)/' < ${MT_CONFIG_CGI_SRC_PATH}}
 
