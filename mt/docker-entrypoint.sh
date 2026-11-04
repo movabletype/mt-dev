@@ -20,6 +20,8 @@ $SUDO chmod 777 /var/www/html
 $SUDO chmod 777 /var/www/cgi-bin/mt/mt-static/support
 $SUDO chmod 777 /var/www/cgi-bin/mt/themes
 
+export PHP_INI_SCAN_DIR=:/etc/mt/php-conf/
+
 if [ "$1" = "apache2-foreground" ]; then
     # invoke php-fpm
     if [ -e /usr/sbin/php-fpm ]; then
