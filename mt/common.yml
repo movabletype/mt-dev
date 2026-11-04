@@ -51,6 +51,7 @@ services:
       - "support:/var/www/cgi-bin/mt/mt-static/support:${DOCKER_VOLUME_MOUNT_FLAG:-rw}"
       # override entrypoint
       - "./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
+      - "./php.ini:/etc/mt/php-conf/php.ini"
     ports:
       - "${HTTPD_EXPOSE_PORT:-80}:80"
     command: apache2-foreground
